@@ -54,7 +54,7 @@
 
 ## C. Infraestructura
 
-- [ ] **T10 — Carpeta de datos** (RF-17)
+- [x] **T10 — Carpeta de datos** (RF-17)
   - Archivos: `infrastructure/app_paths.py`, `tests/infrastructure/test_paths.py`.
   - Hecho cuando: con `CROCHET_TRACKER_DATA` definida se usa esa ruta; sin ella se usa la del
     usuario; y la carpeta se crea si no existe.
