@@ -26,7 +26,8 @@ Detalle y reparto de responsabilidades: `AGENTS.md`.
 `note.py` (entidad `Note`: texto y fecha de creación conservada al editar) y `undo.py` (`Undo`:
 un solo paso, caducidad de 10 minutos, el inverso es un `Callable`).
 `crochet_tracker/infrastructure/` — existe: `app_paths.py` (carpeta de datos, override por
-`CROCHET_TRACKER_DATA`) y `migrations.py` (esquema v1 y migración con copia `.bak`). Faltan
+`CROCHET_TRACKER_DATA`), `migrations.py` (esquema v1 y migración con copia `.bak`) y
+`sqlite_repository.py` (`SqliteProjectRepository`: `add`, `get`, `list_all`, `save`). Faltan
 `application/` y `presentation/`.
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
@@ -58,7 +59,9 @@ T08 y T09 hechas: `undo.py` con `Undo` (una entrada, caducidad de 10 min medida 
 inyectado, sin rehacer) y `restore_rows`/`restore_knots` en `Project` para el inverso.
 T10 hecha: `app_paths.data_dir()`. T11 hecha: `migrations.migrate()` (v0 → v1, copia
 `crochet.db.bak`, paso fallido con `ROLLBACK`, base más nueva rechazada con `MigrationError`).
-Siguiente paso: T12 (repositorio: crear, listar y abrir).
+T12 y T13 hechas: `SqliteProjectRepository` con `add`, `get`, `list_all` (orden por `updated_at`
+desc) y `save` (todos los campos mutables + `updated_at`); una conexión por operación con WAL,
+`synchronous = FULL` y `foreign_keys` activado. Siguiente paso: T14 (repositorio: notas).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).

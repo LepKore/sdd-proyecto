@@ -64,12 +64,12 @@
   - Hecho cuando: una base creada a mano con `user_version = 0` migra a 1, deja `crochet.db.bak`,
     y un paso que falla hace `ROLLBACK` sin tocar los datos.
 
-- [ ] **T12 — Repositorio: crear, listar y abrir** (RF-1, RF-2, RF-3)
+- [x] **T12 — Repositorio: crear, listar y abrir** (RF-1, RF-2, RF-3)
   - Archivos: `infrastructure/sqlite_repository.py`, `tests/infrastructure/test_repository.py`.
   - Hecho cuando: crear guarda el proyecto, la lista sale ordenada por `updated_at` descendente y
     abrir sin cambios no reordena.
 
-- [ ] **T13 — Repositorio: renombrar, terminado, contadores, página** (RF-4, RF-5, RF-10, RF-11, RF-12)
+- [x] **T13 — Repositorio: renombrar, terminado, contadores, página** (RF-4, RF-5, RF-10, RF-11, RF-12)
   - Archivos: `infrastructure/sqlite_repository.py`, `tests/infrastructure/test_repository.py`.
   - Hecho cuando: cada `UPDATE` persiste, actualiza `updated_at` y se lee igual tras reabrir la base.
 

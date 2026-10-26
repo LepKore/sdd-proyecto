@@ -34,6 +34,10 @@ class Project:
     knots_done: int = 0
     is_finished: bool = False
     guide_page: int = 1
+    guide_file: str | None = None
+    id: int | None = None
+    created_at: int = 0
+    updated_at: int = 0
 
     def __post_init__(self) -> None:
         self.name = normalize_name(self.name)
