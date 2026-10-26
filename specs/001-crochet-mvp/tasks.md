@@ -73,15 +73,15 @@
   - Archivos: `infrastructure/sqlite_repository.py`, `tests/infrastructure/test_repository.py`.
   - Hecho cuando: cada `UPDATE` persiste, actualiza `updated_at` y se lee igual tras reabrir la base.
 
-- [ ] **T14 — Repositorio: notas** (RF-14, RF-15)
+- [x] **T14 — Repositorio: notas** (RF-14, RF-15)
   - Archivos: `infrastructure/sqlite_repository.py`, `tests/infrastructure/test_notes_repo.py`.
   - Hecho cuando: alta, edición y borrado persisten, y las notas salen de más reciente a más antigua.
 
-- [ ] **T15 — Repositorio: borrar proyecto** (RF-6)
+- [x] **T15 — Repositorio: borrar proyecto** (RF-6)
   - Archivos: `infrastructure/sqlite_repository.py`, `tests/infrastructure/test_delete_repo.py`.
   - Hecho cuando: borrar elimina el proyecto, sus notas (cascada) y su PDF, y la lista ya no lo trae.
 
-- [ ] **T16 — Escritura atómica** (RF-13)
+- [x] **T16 — Escritura atómica** (RF-13)
   - Archivos: `tests/infrastructure/test_atomicity.py`.
   - Hecho cuando: un `COMMIT` forzado a fallar deja el valor anterior intacto y no hay fila a medias.
 

@@ -61,13 +61,17 @@ T10 hecha: `app_paths.data_dir()`. T11 hecha: `migrations.migrate()` (v0 → v1,
 `crochet.db.bak`, paso fallido con `ROLLBACK`, base más nueva rechazada con `MigrationError`).
 T12 y T13 hechas: `SqliteProjectRepository` con `add`, `get`, `list_all` (orden por `updated_at`
 desc) y `save` (todos los campos mutables + `updated_at`); una conexión por operación con WAL,
-`synchronous = FULL` y `foreign_keys` activado. Siguiente paso: T14 (repositorio: notas).
+`synchronous = FULL` y `foreign_keys` activado. T14 y T15 hechas: `add_note`, `list_notes` (más
+reciente primero), `save_note` (conserva la fecha) y `delete_note`; `delete_project` borra el
+proyecto, sus notas por cascada y su PDF de `<datos>/guides/`, y `Note` gana `id`. T16 hecha:
+`tests/infrastructure/test_atomicity.py` fuerza fallos de `COMMIT` y comprueba que no queda nada a
+medias. Siguiente paso: T17 (guía en disco).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
-Problemas conocidos: solo existen el esqueleto (T01) y los errores de dominio (T02); no hay
-lógica ni tests de comportamiento aún. Los comandos de §4 ya se verifican con `pip install -e ".[dev]"` y
-`pytest -q`; el resto sigue sin probar.
+Problemas conocidos: aún no existen las capas `application/` ni `presentation/`, así que la
+aplicación todavía no se puede ejecutar; el progreso ya se guarda, pero solo desde los tests.
+`pytest -q` está en verde.
 
 ## 7. Decisiones cerradas (no reabrir sin motivo)
 - **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el
