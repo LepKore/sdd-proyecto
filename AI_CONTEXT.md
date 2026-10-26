@@ -39,15 +39,19 @@ en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve sol
 `main_window.py` (`MainWindow`: lista o proyecto abierto, uno cada vez), `project_list_view.py`
 (lista con estado vacío, crear, etiqueta "Terminado" y borrado con confirmación), `project_view.py`
 (nombre editable con "Cambiar nombre", estado terminado, contadores de filas y nudos con `+1`/`−1`,
-aviso de deshacer y el panel de notas) y `notes_panel.py` (`NotesPanel`: alta, edición con
-Guardar/Cancelar y borrado con confirmación).
-`crochet_tracker/__main__.py` arranca con los adaptadores reales; todavía sin argumentos ni códigos
-de salida (T33).
+aviso de deshacer y el panel de notas), `notes_panel.py` (`NotesPanel`: alta, edición con
+Guardar/Cancelar y borrado con confirmación) y `guide_view.py` (`GuideView`: render de la página con
+pypdfium2, adjuntar la guía y pasar de página).
+`crochet_tracker/infrastructure/single_instance.py` — `QLockFile` en `<datos>/app.lock`.
+`crochet_tracker/__main__.py` — arranque: sin argumentos, códigos 0/1/2 como en plan §3.2 y
+`error.log` cuando falla la base.
+`CrochetTracker.spec` — empaquetado con PyInstaller (no acepta `-m`: el punto de entrada es
+`crochet_tracker/__main__.py` con `--paths .`).
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
 Inicialización: `pip install -e .[dev]` (`pyproject.toml` ya existe).
-Desarrollo: `python -m crochet_tracker` (arranca; todavía sin argumentos ni códigos de salida).
+Desarrollo: `python -m crochet_tracker` (sin argumentos; códigos 0/1/2 en `__main__.py`).
 Testing: `pytest -q` (incluye `pytest-qt`); un solo test: `pytest -q tests/<capa>/test_<modulo>.py::test_<caso>`.
 Lint / typecheck: no configurado todavía.
 Deploy: `pyinstaller --windowed --name CrochetTracker -m crochet_tracker` (informativo; requiere confirmación).
@@ -95,7 +99,14 @@ es deshacible. Queda en manos de la vista llamar a `undo.discard()` al volver a 
 otro proyecto. T24 hecha: `attach_guide.py` (no admite una segunda guía; si falla el guardado deja
 el proyecto sin guía) y `change_page.py` (persiste la página, no pasa del tope conocido y no escribe
 si la página no cambia).
-Siguiente paso: T32 (instancia única) y T33 (`__main__.py` con argumentos y códigos de salida).
+Siguiente paso: cerrar el MVP (T35 solo espera la comprobación manual en un equipo sin Python).
+T32 hecha: `SingleInstance` (`QLockFile` en `<datos>/app.lock`); el segundo proceso se cierra con
+aviso. T33 hecha: `__main__.py` con códigos 0/1/2 (argumento desconocido → 2; base corrupta o de
+versión más nueva → 1 con `error.log`). T34 hecha: `GuideView` pinta la página con pypdfium2
+(pixeles BGR a `QImage`, sin Pillow ni numpy), guarda la página al pasar, no pasa de la última, y una
+página rota o un PDF ilegible solo afectan a esa página o al proyecto. T35: `CrochetTracker.spec`
+versionado, `.exe` construido y arrancado con `QT_QPA_PLATFORM=offscreen` (crea `crochet.db`,
+`app.lock` y `crochet.db.bak` en la carpeta de datos); falta la prueba manual en un equipo sin Python.
 T30 hecha: el aviso de deshacer aparece tras un cambio de contador o de nota, se oculta a los 10
 minutos (un `QTimer` de 30 s lo revisa), desaparece al deshacer, y no lo crean renombrar ni marcar
 terminado (aunque tampoco borran el pendiente); volver a la lista o abrir otro proyecto lo descarta.
@@ -121,9 +132,8 @@ tareas cada uno y §7 solo admite un par.
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
-Problemas conocidos: faltan la instancia única y el arranque definitivo (T32–T33), el visor del PDF
-con la página (T34) y el empaquetado (T35), así que todavía no se puede tejer siguiendo una guía;
-`change_page` aún no tiene control en pantalla. `pytest -q` está en verde (252 tests).
+Problemas conocidos: falta pasar a mano la lista de §8 de la spec en un equipo sin Python (T35);
+el resto del MVP está implementado y `pytest -q` está en verde (276 tests).
 
 ## 7. Decisiones cerradas (no reabrir sin motivo)
 - **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el

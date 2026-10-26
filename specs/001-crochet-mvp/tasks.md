@@ -167,19 +167,19 @@
 
 ## F. Arranque único
 
-- [ ] **T32 — Instancia única** (RF-7, CL-29)
+- [x] **T32 — Instancia única** (RF-7, CL-29)
   - Archivos: `infrastructure/single_instance.py`, `tests/infrastructure/test_single_instance.py`.
   - Hecho cuando: el primer proceso obtiene el bloqueo, el segundo no, y liberar el primero permite
     arrancar de nuevo.
 
-- [ ] **T33 — Entrada, argumentos y códigos de salida** (RF-7, plan §3.2)
+- [x] **T33 — Entrada, argumentos y códigos de salida** (RF-7, plan §3.2)
   - Archivos: `crochet_tracker/__main__.py`, `tests/test_entrypoint.py`.
   - Hecho cuando: sin argumentos arranca; con un argumento desconocido escribe una línea en stderr y
     sale con 2; con la base corrupta sale con 1 y deja constancia en `error.log`.
 
 ## G. Guía en pantalla
 
-- [ ] **T34 — Ver y recorrer el PDF** (RF-8, RF-9, RF-10)
+- [x] **T34 — Ver y recorrer el PDF** (RF-8, RF-9, RF-10)
   - Archivos: `presentation/guide_view.py`, `tests/presentation/test_guide_view.py`.
   - Hecho cuando: se ve la página guardada (o la primera si nunca se abrió), no se pasa de la
     última, un PDF ilegible muestra aviso y un error de una sola página no bloquea el resto

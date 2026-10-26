@@ -22,10 +22,11 @@ el repositorio sqlite3; `domain/` y `application/` no importan ninguna de las tr
 ## Comandos
 Verificados salvo donde se indica (Python 3.12+; en esta máquina hay un `.venv` con 3.13):
 - Instalar: `pip install -e .[dev]`
-- Ejecutar: `python -m crochet_tracker` (previsto; `__main__.py` llega con T25/T33)
+- Ejecutar: `python -m crochet_tracker` (sin argumentos; el estado vive en `%APPDATA%`)
 - Tests: `pytest -q`
 - Un solo test: `pytest -q tests/<capa>/test_<modulo>.py::test_<caso>`
-- Empaquetar: `pyinstaller --windowed --name CrochetTracker -m crochet_tracker` (previsto)
+- Empaquetar: `pyi-makespec --windowed --name CrochetTracker --paths . crochet_tracker/__main__.py`
+  y luego `pyinstaller --noconfirm CrochetTracker.spec` (PyInstaller no acepta `-m`)
 
 ## Git workflow
 - `dev` es la rama de trabajo; `main` solo recibe el MVP, por PR. Los commits y su formato están
