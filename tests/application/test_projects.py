@@ -1,4 +1,4 @@
-"""Project use cases, tested with in-memory doubles only (RF-1..RF-6, T20)."""
+﻿"""Project use cases, tested with in-memory doubles only (RF-1..RF-6, T20)."""
 
 import pathlib
 
@@ -104,7 +104,7 @@ def test_rename_to_a_blank_name_keeps_the_previous_one(repository, clock):
 
 def test_rename_restores_the_old_name_when_saving_fails(repository, clock):
     project = create_project(repository, clock, "Bufanda")
-    repository.fail_on_save = True
+    repository.fail_on_write = True
     with pytest.raises(SaveFailed):
         rename_project(repository, clock, project, "Chal")
     assert project.name == "Bufanda"
@@ -123,7 +123,7 @@ def test_finished_state_toggles_and_is_saved(repository, clock):
 
 def test_finished_state_is_kept_when_saving_fails(repository, clock):
     project = create_project(repository, clock, "Bufanda")
-    repository.fail_on_save = True
+    repository.fail_on_write = True
     with pytest.raises(SaveFailed):
         set_finished(repository, clock, project)
     assert project.is_finished is False

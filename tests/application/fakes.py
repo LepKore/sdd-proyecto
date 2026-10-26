@@ -21,16 +21,21 @@ class FakeClock:
 
 
 class FakeRepository:
-    """Stores copies, like the real one: whatever the view does in memory stays there."""
+    """Stores copies, like the real one: whatever the view does in memory stays there.
+
+    ``fail_on_write`` makes every write fail, which is how a full disk or a locked file
+    looks from the application layer (CL-25).
+    """
 
     def __init__(self) -> None:
         self.projects: dict[int, Project] = {}
         self.notes: dict[int, tuple[int, Note]] = {}
-        self.fail_on_save = False
+        self.fail_on_write = False
         self.saves = 0
         self._next_id = 1
 
     def add(self, project: Project, now: int) -> int:
+        self._check_writable()
         project_id = self._take_id()
         self.projects[project_id] = replace(
             project, id=project_id, created_at=now, updated_at=now
@@ -48,18 +53,19 @@ class FakeRepository:
         return [replace(project) for project in newest_first]
 
     def save(self, project: Project, now: int) -> None:
-        if self.fail_on_save:
-            raise RuntimeError("disk I/O error")
+        self._check_writable()
         self.saves += 1
         self.projects[project.id] = replace(project, updated_at=now)
 
     def delete_project(self, project_id: int) -> None:
+        self._check_writable()
         self.projects.pop(project_id, None)
         self.notes = {
             note_id: entry for note_id, entry in self.notes.items() if entry[0] != project_id
         }
 
     def add_note(self, project_id: int, note: Note) -> int:
+        self._check_writable()
         note_id = self._take_id()
         self.notes[note_id] = (project_id, replace(note, id=note_id))
         return note_id
@@ -73,11 +79,17 @@ class FakeRepository:
         return [replace(note) for note in newest_first]
 
     def save_note(self, note: Note) -> None:
+        self._check_writable()
         owner = self.notes[note.id][0]
         self.notes[note.id] = (owner, replace(note))
 
     def delete_note(self, note_id: int) -> None:
+        self._check_writable()
         self.notes.pop(note_id, None)
+
+    def _check_writable(self) -> None:
+        if self.fail_on_write:
+            raise RuntimeError("disk I/O error")
 
     def _take_id(self) -> int:
         new_id = self._next_id
