@@ -18,7 +18,7 @@
 
 ## B. Dominio (Python puro, sin Qt ni sqlite)
 
-- [ ] **T03 — Nombre del proyecto** (RF-1, RF-4)
+- [x] **T03 — Nombre del proyecto** (RF-1, RF-4)
   - Archivos: `domain/project.py`, `tests/domain/test_project_name.py`.
   - Hecho cuando: los tests cubren recorte de extremos, rechazo de vacío/solo espacios, límite de
     100 caracteres y permiso de nombres repetidos (CL-1..CL-6), y `grep -r PySide6 domain/` sale vacío.

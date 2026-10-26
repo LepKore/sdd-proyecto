@@ -21,8 +21,9 @@ Detalle y reparto de responsabilidades: `AGENTS.md`.
 `.github/workflows/ci.yml` — CI: `pytest -q`; el check `tests` es obligatorio para mergear a `main`.
 `docs/constitution.md` — principios y puertas de calidad; gobierna specs y PRs.
 `specs/` — todavía no existe; cuando exista, no se modifica sin petición explícita.
-`crochet_tracker/domain/` — existe: `errors.py` (jerarquía `DomainError`). Faltan
-`application/`, `infrastructure/` y `presentation/`.
+`crochet_tracker/domain/` — existe: `errors.py` (jerarquía `DomainError`) y `project.py`
+(`normalize_name`: recorte de extremos, 1..100 caracteres). Faltan `application/`,
+`infrastructure/` y `presentation/`.
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
@@ -44,7 +45,8 @@ commits y ramas) y CI con el check `tests` obligatorio en `main`.
 En progreso: `specs/001-crochet-mvp/tasks.md` (35 tareas T01..T35, en orden de dependencia). T01
 hecha: `pyproject.toml`, paquete y `tests/` vacíos, instalación editable. T02 hecha:
 `domain/errors.py` con `DomainError`, `InvalidProjectName` y `EmptyNoteText`, sin texto de
-interfaz. Siguiente paso: T03 (nombre del proyecto).
+interfaz. T03 hecha: `domain/project.py` con `normalize_name` (recorte de extremos, rechazo de
+vacío y de más de 100 caracteres, nombres repetidos permitidos). Siguiente paso: T04 (contadores).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
