@@ -12,11 +12,10 @@ from pathlib import Path
 
 import pypdfium2 as pdfium
 
+from crochet_tracker.application.errors import GuideError
 from crochet_tracker.infrastructure.app_paths import GUIDES_DIR_NAME, data_dir
 
-
-class GuideError(Exception):
-    """The chosen file cannot be used as a guide."""
+__all__ = ["GuideError", "GuideStore"]
 
 
 def _check_readable(path: Path) -> None:

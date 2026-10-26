@@ -98,16 +98,23 @@ class FakeRepository:
 
 
 class FakeGuideStore:
-    """Holds the copied bytes in memory; it never touches disk."""
+    """Holds the copied bytes in memory, and on disk when it is given a folder."""
 
-    def __init__(self) -> None:
+    def __init__(self, base_dir: Path | None = None) -> None:
         self.files: dict[str, bytes] = {}
+        self._base_dir = base_dir
 
     def copy(self, project_id: int, source: Path) -> str:
+        data = source.read_bytes()
         name = f"{project_id}-{len(self.files) + 1}.pdf"
-        self.files[name] = source.read_bytes()
+        self.files[name] = data
+        if self._base_dir is not None:
+            self._base_dir.mkdir(parents=True, exist_ok=True)
+            (self._base_dir / name).write_bytes(data)
         return name
 
     def path(self, name: str | None) -> Path | None:
-        # shortcut: T19 only needs the shape of the port; real paths arrive with T24's tests.
-        return None
+        if not name or self._base_dir is None:
+            return None
+        stored = self._base_dir / name
+        return stored if stored.is_file() else None

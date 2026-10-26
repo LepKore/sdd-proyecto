@@ -2,7 +2,7 @@
 
 from PySide6.QtWidgets import QMainWindow, QStackedWidget, QWidget
 
-from crochet_tracker.application.ports import Clock, ProjectRepository
+from crochet_tracker.application.ports import Clock, GuideStore, ProjectRepository
 from crochet_tracker.domain.project import Project
 from crochet_tracker.presentation import strings
 from crochet_tracker.presentation.project_list_view import ProjectListView
@@ -16,12 +16,13 @@ class MainWindow(QMainWindow):
         self,
         repository: ProjectRepository,
         clock: Clock,
+        guides: GuideStore,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle(strings.APP_TITLE)
         self.list_view = ProjectListView(repository, clock, self.open_project)
-        self.project_view = ProjectView(repository, clock, self.show_list)
+        self.project_view = ProjectView(repository, clock, guides, self.show_list)
 
         self.stack = QStackedWidget()
         self.stack.addWidget(self.list_view)
