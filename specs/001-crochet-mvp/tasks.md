@@ -23,12 +23,12 @@
   - Hecho cuando: los tests cubren recorte de extremos, rechazo de vacío/solo espacios, límite de
     100 caracteres y permiso de nombres repetidos (CL-1..CL-6), y `grep -r PySide6 domain/` sale vacío.
 
-- [ ] **T04 — Contadores de filas y nudos** (RF-11, RF-12)
+- [x] **T04 — Contadores de filas y nudos** (RF-11, RF-12)
   - Archivos: `domain/project.py`, `tests/domain/test_counters.py`.
   - Hecho cuando: subir uno no altera el otro, bajar en cero no cambia el valor ni lanza error, y
     se acepta 100.000 sin recorte (CL-17, CL-18).
 
-- [ ] **T05 — Estado terminado** (RF-5)
+- [x] **T05 — Estado terminado** (RF-5)
   - Archivos: `domain/project.py`, `tests/domain/test_finished.py`.
   - Hecho cuando: alternar el estado dos veces deja el valor inicial y contar en un proyecto
     terminado no cambia su estado (CL-28).
