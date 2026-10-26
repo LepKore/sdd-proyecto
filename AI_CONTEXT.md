@@ -38,8 +38,9 @@ en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve sol
 `crochet_tracker/presentation/` — existe: `strings.py` (todos los textos en español),
 `main_window.py` (`MainWindow`: lista o proyecto abierto, uno cada vez), `project_list_view.py`
 (lista con estado vacío, crear, etiqueta "Terminado" y borrado con confirmación), `project_view.py`
-(nombre, contadores de filas y nudos con `+1`/`−1` y el panel de notas) y `notes_panel.py`
-(`NotesPanel`: alta, edición con Guardar/Cancelar y borrado con confirmación).
+(nombre editable con "Cambiar nombre", estado terminado, contadores de filas y nudos con `+1`/`−1`,
+aviso de deshacer y el panel de notas) y `notes_panel.py` (`NotesPanel`: alta, edición con
+Guardar/Cancelar y borrado con confirmación).
 `crochet_tracker/__main__.py` arranca con los adaptadores reales; todavía sin argumentos ni códigos
 de salida (T33).
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
@@ -94,7 +95,13 @@ es deshacible. Queda en manos de la vista llamar a `undo.discard()` al volver a 
 otro proyecto. T24 hecha: `attach_guide.py` (no admite una segunda guía; si falla el guardado deja
 el proyecto sin guía) y `change_page.py` (persiste la página, no pasa del tope conocido y no escribe
 si la página no cambia).
-Siguiente paso: T30 (deshacer en pantalla sobre el `Undo` que ya comparten contadores y notas).
+Siguiente paso: T32 (instancia única) y T33 (`__main__.py` con argumentos y códigos de salida).
+T30 hecha: el aviso de deshacer aparece tras un cambio de contador o de nota, se oculta a los 10
+minutos (un `QTimer` de 30 s lo revisa), desaparece al deshacer, y no lo crean renombrar ni marcar
+terminado (aunque tampoco borran el pendiente); volver a la lista o abrir otro proyecto lo descarta.
+T31 hecha: el nombre se edita en la propia pantalla (`QLineEdit` + "Cambiar nombre", se recorta y
+rechaza el vacío) y el botón de finalizado alterna entre "Marcar terminado" y "Marcar en curso" con
+la etiqueta "Terminado" a la vista.
 T28 hecha: `project_view.py` muestra los dos contadores con `+1`/`−1`, guarda en el acto, desactiva
 la bajada en cero y ante un guardado fallido avisa y vuelve al valor anterior. T29 hecha:
 `notes_panel.py` añade notas (la más reciente arriba, fecha `dd/mm/aaaa hh:mm`), edita con
@@ -114,9 +121,9 @@ tareas cada uno y §7 solo admite un par.
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
-Problemas conocidos: falta el deshacer en pantalla (T30), la ficha del proyecto (T31), la instancia
-única y el arranque definitivo (T32–T33), el visor del PDF (T34) y el empaquetado (T35), así que
-todavía no se puede tejer con una guía. `pytest -q` está en verde (223 tests).
+Problemas conocidos: faltan la instancia única y el arranque definitivo (T32–T33), el visor del PDF
+con la página (T34) y el empaquetado (T35), así que todavía no se puede tejer siguiendo una guía;
+`change_page` aún no tiene control en pantalla. `pytest -q` está en verde (252 tests).
 
 ## 7. Decisiones cerradas (no reabrir sin motivo)
 - **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el

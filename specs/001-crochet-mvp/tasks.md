@@ -155,12 +155,12 @@
   - Hecho cuando: se añade una nota, se edita con Guardar/Cancelar, se borra con confirmación, y
     Cancelar deja el texto anterior (CL-23).
 
-- [ ] **T30 — Aviso de deshacer** (RF-16)
+- [x] **T30 — Aviso de deshacer** (RF-16)
   - Archivos: `presentation/project_view.py`, `tests/presentation/test_undo_banner.py`.
   - Hecho cuando: tras un cambio aparece el aviso, desaparece a los 10 minutos o al deshacer, y no
     aparece tras renombrar, marcar terminado ni cambiar de página.
 
-- [ ] **T31 — Renombrar y marcar terminado dentro del proyecto** (RF-4, RF-5)
+- [x] **T31 — Renombrar y marcar terminado dentro del proyecto** (RF-4, RF-5)
   - Archivos: `presentation/project_view.py`, `tests/presentation/test_project_actions.py`.
   - Hecho cuando: el nombre nuevo se ve en la pantalla y en la lista, y el botón de finalizado
     alterna la etiqueta.
