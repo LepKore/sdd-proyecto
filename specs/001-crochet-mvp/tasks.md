@@ -96,17 +96,17 @@
 
 ## D. Aplicación
 
-- [ ] **T19 — Puertos y dobles de test** (RF-3)
+- [x] **T19 — Puertos y dobles de test** (RF-3)
   - Archivos: `application/ports.py`, `tests/application/fakes.py`.
   - Hecho cuando: existen `ProjectRepository`, `GuideStore` y `Clock` como `Protocol`, y los dobles
     en memoria implementan los mismos métodos sin importar sqlite ni Qt.
 
-- [ ] **T20 — Casos de uso de proyecto** (RF-1..RF-6)
+- [x] **T20 — Casos de uso de proyecto** (RF-1..RF-6)
   - Archivos: `application/create_project.py`, `list_projects.py`, `open_project.py`,
     `rename_project.py`, `set_finished.py`, `delete_project.py`, `tests/application/test_projects.py`.
   - Hecho cuando: cada caso de uso se prueba con los dobles y no importa nada de `infrastructure/`.
 
-- [ ] **T21 — Casos de uso de contadores y guardado** (RF-11, RF-12, RF-13)
+- [x] **T21 — Casos de uso de contadores y guardado** (RF-11, RF-12, RF-13)
   - Archivos: `application/counters.py`, `tests/application/test_counters.py`.
   - Hecho cuando: si el repositorio falla al guardar, el caso de uso devuelve el valor anterior con
     un error tipado que la vista puede mostrar (RF-13).

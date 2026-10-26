@@ -29,11 +29,15 @@ un solo paso, caducidad de 10 minutos, el inverso es un `Callable`).
 carpeta `guides`, override por `CROCHET_TRACKER_DATA`), `migrations.py` (esquema v1 y migración
 con copia `.bak`), `sqlite_repository.py` (`SqliteProjectRepository`: proyectos y notas, borrado
 en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve solo su nombre) y
-`clock.py` (`SystemClock.now()`, segundos). Faltan `application/` y `presentation/`.
+`clock.py` (`SystemClock.now()`, segundos).
+`crochet_tracker/application/` — existe: `ports.py` (`ProjectRepository`, `GuideStore` y `Clock` como
+`Protocol`), `errors.py` (`SaveFailed`), casos de uso `create_project.py`, `list_projects.py`,
+`open_project.py`, `rename_project.py`, `set_finished.py`, `delete_project.py` y `counters.py`;
+los dobles en memoria viven en `tests/application/fakes.py`. Falta `presentation/`.
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
-Inicialización: `pip install -e .[dev]` (previsto; aún no hay `pyproject.toml`).
+Inicialización: `pip install -e .[dev]` (`pyproject.toml` ya existe).
 Desarrollo: `python -m crochet_tracker` (previsto).
 Testing: `pytest -q`; un solo test: `pytest -q tests/test_<modulo>.py::test_<caso>`.
 Lint / typecheck: no configurado todavía.
@@ -69,13 +73,19 @@ proyecto, sus notas por cascada y su PDF de `<datos>/guides/`, y `Note` gana `id
 medias. T17 hecha: `GuideStore` copia el PDF a `<datos>/guides/<id>-<uuid>.pdf` con un `.part`
 temporal y `os.replace`, rechaza lo que PDFium no abre (dañado, protegido o de 0 páginas) y
 `path()` devuelve `None` cuando la copia ya no está. T18 hecha: `clock.SystemClock.now()`.
-Siguiente paso: T19 (puertos `ProjectRepository`, `GuideStore` y `Clock`, y dobles en memoria).
+T19 hecha: `application/ports.py` con los tres `Protocol` (con `@runtime_checkable` para que los
+dobles se comprueben con `isinstance`) y `tests/application/fakes.py` en memoria, que guardan copias
+como el repositorio real. T20 hecha: casos de uso de proyecto (crear, listar, abrir, renombrar,
+marcar terminado, borrar); abrir no reordena la lista. T21 hecha: `counters.py` con
+`add_rows`/`remove_rows`/`add_knots`/`remove_knots`, guardado inmediato, nada se escribe al bajar de
+cero (CL-17) y un guardado fallido deja los contadores como estaban y lanza `SaveFailed` (RF-13).
+Siguiente paso: T22 (casos de uso de notas), luego T23 (deshacer) y T24 (guía y página).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
-Problemas conocidos: aún no existen las capas `application/` ni `presentation/`, así que la
-aplicación todavía no se puede ejecutar; el progreso ya se guarda, pero solo desde los tests.
-`pytest -q` está en verde.
+Problemas conocidos: aún no existe la capa `presentation/`, así que la aplicación todavía no se
+puede ejecutar; `application/` y la persistencia solo se ejercitan desde los tests.
+`pytest -q` está en verde (140 tests).
 
 ## 7. Decisiones cerradas (no reabrir sin motivo)
 - **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el
