@@ -1,15 +1,17 @@
-"""sqlite persistence for projects (RF-1, RF-2, RF-3, RF-4, RF-5, RF-10, RF-11, RF-12)."""
+"""sqlite persistence for projects and notes (RF-1..RF-6, RF-10..RF-15)."""
 
 import sqlite3
 from contextlib import closing
 from pathlib import Path
 
+from crochet_tracker.domain.note import Note
 from crochet_tracker.domain.project import Project
 from crochet_tracker.infrastructure.migrations import migrate
 
 _COLUMNS = (
     "name, is_finished, rows_done, knots_done, guide_page, guide_file, created_at, updated_at"
 )
+_NOTE_COLUMNS = "body, created_at"
 
 
 def _to_project(row: sqlite3.Row) -> Project:
@@ -26,11 +28,16 @@ def _to_project(row: sqlite3.Row) -> Project:
     )
 
 
+def _to_note(row: sqlite3.Row) -> Note:
+    return Note(body=row["body"], created_at=row["created_at"], id=row["id"])
+
+
 class SqliteProjectRepository:
     """One connection per operation: no shared state to keep in sync."""
 
     def __init__(self, db_path: Path) -> None:
         self._db_path = db_path
+        self._guides_dir = db_path.parent / "guides"
         db_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._connect()) as connection:
             migrate(connection, db_path)
@@ -93,3 +100,42 @@ class SqliteProjectRepository:
                     project.id,
                 ),
             )
+
+    def delete_project(self, project_id: int) -> None:
+        """Remove the project, its notes (cascade) and its copied guide (RF-6)."""
+        project = self.get(project_id)
+        if project is None:
+            return
+        with closing(self._connect()) as connection, connection:
+            connection.execute("DELETE FROM project WHERE id = ?", (project_id,))
+        if project.guide_file:
+            # Only the file name is stored; keep it inside the guides folder.
+            (self._guides_dir / Path(project.guide_file).name).unlink(missing_ok=True)
+
+    def add_note(self, project_id: int, note: Note) -> int:
+        """Insert the note and return its new id."""
+        with closing(self._connect()) as connection, connection:
+            cursor = connection.execute(
+                "INSERT INTO note (project_id, body, created_at) VALUES (?, ?, ?)",
+                (project_id, note.body, note.created_at),
+            )
+            return cursor.lastrowid
+
+    def list_notes(self, project_id: int) -> list[Note]:
+        """Newest first (RF-14)."""
+        with closing(self._connect()) as connection:
+            rows = connection.execute(
+                f"SELECT id, {_NOTE_COLUMNS} FROM note WHERE project_id = ?"
+                " ORDER BY created_at DESC, id DESC",
+                (project_id,),
+            ).fetchall()
+        return [_to_note(row) for row in rows]
+
+    def save_note(self, note: Note) -> None:
+        """Only the text changes; the creation time is kept (RF-15)."""
+        with closing(self._connect()) as connection, connection:
+            connection.execute("UPDATE note SET body = ? WHERE id = ?", (note.body, note.id))
+
+    def delete_note(self, note_id: int) -> None:
+        with closing(self._connect()) as connection, connection:
+            connection.execute("DELETE FROM note WHERE id = ?", (note_id,))

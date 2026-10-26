@@ -21,6 +21,7 @@ class Note:
 
     body: str
     created_at: int
+    id: int | None = None
 
     def __post_init__(self) -> None:
         self.body = validate_body(self.body)
