@@ -11,7 +11,7 @@
   - Hecho cuando: `pip install -e .[dev]` instala sin errores, `python -c "import crochet_tracker"`
     no falla y `pytest -q` informa de 0 tests recogidos (no de error de importación).
 
-- [ ] **T02 — Errores de dominio (sin texto de usuario)**
+- [x] **T02 — Errores de dominio (sin texto de usuario)**
   - Archivos: `crochet_tracker/domain/errors.py`.
   - Hecho cuando: `pytest -q tests/domain/test_errors.py` pasa y los mensajes están en inglés,
     sin ninguna frase de interfaz (constitución §6).
