@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# datos locales de la aplicación (nunca se versionan)
+*.db
+*.db-wal
+*.db-shm
+*.db.bak
+error.log
+
+.env
