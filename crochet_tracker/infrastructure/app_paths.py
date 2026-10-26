@@ -9,6 +9,7 @@ from pathlib import Path
 
 DATA_ENV_VAR = "CROCHET_TRACKER_DATA"
 APP_DIR_NAME = "CrochetTracker"
+GUIDES_DIR_NAME = "guides"
 
 
 def data_dir() -> Path:

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from crochet_tracker.domain.note import Note
 from crochet_tracker.domain.project import Project
+from crochet_tracker.infrastructure.app_paths import GUIDES_DIR_NAME
 from crochet_tracker.infrastructure.migrations import migrate
 
 _COLUMNS = (
@@ -38,7 +39,7 @@ class SqliteProjectRepository:
 
     def __init__(self, db_path: Path) -> None:
         self._db_path = db_path
-        self._guides_dir = db_path.parent / "guides"
+        self._guides_dir = db_path.parent / GUIDES_DIR_NAME
         db_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._connect()) as connection:
             migrate(connection, db_path)
