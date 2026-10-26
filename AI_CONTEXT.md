@@ -1,0 +1,145 @@
+# Contexto del proyecto
+
+> Última verificación: 2026-10-25
+
+## 1. Propósito del proyecto
+Aplicación de escritorio para registrar el avance de un tejido a crochet mientras se sigue
+una guía en PDF: cuenta nudos y filas hechas y guarda el progreso por proyecto para retomarlo.
+Audiencia: uso personal, un usuario por equipo (cosido a fuego en `docs/constitution.md` §8).
+Proyecto educativo: lo mantiene un desarrollador junior.
+
+## 2. Stack tecnológico y arquitectura
+Frontend: PySide6 (Qt para escritorio; LGPL).
+Backend: Python 3.12+; pypdfium2 para render/extracción del PDF; `sqlite3` de la stdlib.
+Empaquetado: PyInstaller (`--windowed`). Tests: `pytest` (`pytest-qt` solo si se testea UI).
+Patrones clave: arquitectura en capas con dependencias hacia dentro
+(`domain` ← `application` ← `infrastructure`/`presentation`), puertos en `application/`.
+Detalle y reparto de responsabilidades: `AGENTS.md`.
+
+## 3. Estructura del proyecto (mapeo)
+`/` — `README.md`, `AGENTS.md`, `docs/`, `.gitignore`.
+`.github/workflows/ci.yml` — CI: `pytest -q`; el check `tests` es obligatorio para mergear a `main`.
+`docs/constitution.md` — principios y puertas de calidad; gobierna specs y PRs.
+`specs/001-crochet-mvp/` — spec, plan técnico y lista de tareas; no se modifica sin pedirlo.
+`crochet_tracker/domain/` — existe: `errors.py` (jerarquía `DomainError`), `project.py`
+(`normalize_name` y la entidad `Project` con nombre, contadores, estado terminado y página) y
+`note.py` (entidad `Note`: texto y fecha de creación conservada al editar) y `undo.py` (`Undo`:
+un solo paso, caducidad de 10 minutos, el inverso es un `Callable`).
+`crochet_tracker/infrastructure/` — existe: `app_paths.py` (carpeta de datos y nombre de la
+carpeta `guides`, override por `CROCHET_TRACKER_DATA`), `migrations.py` (esquema v1 y migración
+con copia `.bak`), `sqlite_repository.py` (`SqliteProjectRepository`: proyectos y notas, borrado
+en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve solo su nombre) y
+`clock.py` (`SystemClock.now()`, segundos).
+`crochet_tracker/application/` — existe: `ports.py` (`ProjectRepository`, `GuideStore` y `Clock` como
+`Protocol`), `errors.py` (`SaveFailed`), casos de uso `create_project.py`, `list_projects.py`,
+`open_project.py`, `rename_project.py`, `set_finished.py`, `delete_project.py`, `counters.py`,
+`notes.py`, `attach_guide.py`, `change_page.py` y `undo_last_change.py` (`can_undo` y
+`undo_last_change`); los dobles en memoria viven en `tests/application/fakes.py`.
+`crochet_tracker/presentation/` — existe: `strings.py` (todos los textos en español),
+`main_window.py` (`MainWindow`: lista o proyecto abierto, uno cada vez; arranca con un tamaño
+recortado a la pantalla y no crece con el PDF), `project_list_view.py`
+(lista con estado vacío, crear, etiqueta "Terminado" y borrado con confirmación), `project_view.py`
+(nombre editable con "Cambiar nombre", estado terminado, contadores de filas y nudos con `+1`/`−1`,
+aviso de deshacer y la guía con el panel de notas a la derecha), `notes_panel.py` (`NotesPanel`: alta, edición con
+Guardar/Cancelar y borrado con confirmación) y `guide_view.py` (`GuideView`: render de la página con
+pypdfium2, adjuntar la guía y pasar de página).
+`crochet_tracker/infrastructure/single_instance.py` — `QLockFile` en `<datos>/app.lock`.
+`crochet_tracker/__main__.py` — arranque: sin argumentos, códigos 0/1/2 como en plan §3.2 y
+`error.log` cuando falla la base.
+`CrochetTracker.spec` — empaquetado con PyInstaller (no acepta `-m`: el punto de entrada es
+`crochet_tracker/__main__.py` con `--paths .`).
+Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
+
+## 4. Comandos críticos
+Inicialización: `pip install -e .[dev]` (`pyproject.toml` ya existe).
+Desarrollo: `python -m crochet_tracker` (sin argumentos; códigos 0/1/2 en `__main__.py`).
+Testing: `pytest -q` (incluye `pytest-qt`); un solo test: `pytest -q tests/<capa>/test_<modulo>.py::test_<caso>`.
+Lint / typecheck: no configurado todavía.
+Deploy: `pyinstaller --windowed --name CrochetTracker -m crochet_tracker` (informativo; requiere confirmación).
+
+## 5. Reglas y convenciones estrictas
+Estilo: type hints en funciones públicas; identificadores en inglés, textos de interfaz en español.
+Librerías permitidas / prohibidas: MIT/BSD/Apache/ISC; GPL y AGPL prohibidas (se distribuye un `.exe`).
+Manejo de errores: se captura donde se puede resolver; `except` vacío es un bug.
+
+## 6. Estado actual y registro de cambios
+Completado: repositorio inicial, `AGENTS.md` con stack y capas, `docs/constitution.md` v2.1.0
+(7 principios: stack mínimo, la spec manda, lógica sin interfaz, tests, persistencia, idiomas,
+commits y ramas) y CI con el check `tests` obligatorio en `main`.
+En progreso: `specs/001-crochet-mvp/tasks.md` (35 tareas T01..T35, en orden de dependencia). T01
+hecha: `pyproject.toml`, paquete y `tests/` vacíos, instalación editable. T02 hecha:
+`domain/errors.py` con `DomainError`, `InvalidProjectName` y `EmptyNoteText`, sin texto de
+interfaz. T03 hecha: `domain/project.py` con `normalize_name` (recorte de extremos, rechazo de
+vacío y de más de 100 caracteres, nombres repetidos permitidos). T04 y T05 hechas: entidad
+`Project` con `change_rows`/`change_knots` (delta, suelo en cero, sin techo) y
+`toggle_finished`. T06 hecha: `guide_page` con `change_page` (suelo en 1, tope en la última
+página conocida). T07 hecha: `note.py` con `Note(body, created_at)` y `edit` que conserva la fecha.
+T08 y T09 hechas: `undo.py` con `Undo` (una entrada, caducidad de 10 min medida con `now`
+inyectado, sin rehacer) y `restore_rows`/`restore_knots` en `Project` para el inverso.
+T10 hecha: `app_paths.data_dir()`. T11 hecha: `migrations.migrate()` (v0 → v1, copia
+`crochet.db.bak`, paso fallido con `ROLLBACK`, base más nueva rechazada con `MigrationError`).
+T12 y T13 hechas: `SqliteProjectRepository` con `add`, `get`, `list_all` (orden por `updated_at`
+desc) y `save` (todos los campos mutables + `updated_at`); una conexión por operación con WAL,
+`synchronous = FULL` y `foreign_keys` activado. T14 y T15 hechas: `add_note`, `list_notes` (más
+reciente primero), `save_note` (conserva la fecha) y `delete_note`; `delete_project` borra el
+proyecto, sus notas por cascada y su PDF de `<datos>/guides/`, y `Note` gana `id`. T16 hecha:
+`tests/infrastructure/test_atomicity.py` fuerza fallos de `COMMIT` y comprueba que no queda nada a
+medias. T17 hecha: `GuideStore` copia el PDF a `<datos>/guides/<id>-<uuid>.pdf` con un `.part`
+temporal y `os.replace`, rechaza lo que PDFium no abre (dañado, protegido o de 0 páginas) y
+`path()` devuelve `None` cuando la copia ya no está. T18 hecha: `clock.SystemClock.now()`.
+T19 hecha: `application/ports.py` con los tres `Protocol` (con `@runtime_checkable` para que los
+dobles se comprueben con `isinstance`) y `tests/application/fakes.py` en memoria, que guardan copias
+como el repositorio real. T20 hecha: casos de uso de proyecto (crear, listar, abrir, renombrar,
+marcar terminado, borrar); abrir no reordena la lista. T21 hecha: `counters.py` con
+`add_rows`/`remove_rows`/`add_knots`/`remove_knots`, guardado inmediato, nada se escribe al bajar de
+cero (CL-17) y un guardado fallido deja los contadores como estaban y lanza `SaveFailed` (RF-13).
+T22 hecha: `notes.py` con `add_note`, `edit_note` y `delete_note`; el texto se conserva si el
+guardado falla y editar mantiene la fecha de creación. T23 hecha: `undo_last_change.py`; los
+contadores y las notas registran el inverso en `Undo` solo si el guardado salió bien, y deshacer no
+es deshacible. Queda en manos de la vista llamar a `undo.discard()` al volver a la lista o abrir
+otro proyecto. T24 hecha: `attach_guide.py` (no admite una segunda guía; si falla el guardado deja
+el proyecto sin guía) y `change_page.py` (persiste la página, no pasa del tope conocido y no escribe
+si la página no cambia).
+Siguiente paso: cerrar el MVP (T35 solo espera la comprobación manual en un equipo sin Python).
+T32 hecha: `SingleInstance` (`QLockFile` en `<datos>/app.lock`); el segundo proceso se cierra con
+aviso. T33 hecha: `__main__.py` con códigos 0/1/2 (argumento desconocido → 2; base corrupta o de
+versión más nueva → 1 con `error.log`). T34 hecha: `GuideView` pinta la página con pypdfium2
+(pixeles BGR a `QImage`, sin Pillow ni numpy), guarda la página al pasar, no pasa de la última, y una
+página rota o un PDF ilegible solo afectan a esa página o al proyecto. T35: `CrochetTracker.spec`
+versionado, `.exe` construido y arrancado con `QT_QPA_PLATFORM=offscreen` (crea `crochet.db`,
+`app.lock` y `crochet.db.bak` en la carpeta de datos); falta la prueba manual en un equipo sin Python.
+T30 hecha: el aviso de deshacer aparece tras un cambio de contador o de nota, se oculta a los 10
+minutos (un `QTimer` de 30 s lo revisa), desaparece al deshacer, y no lo crean renombrar ni marcar
+terminado (aunque tampoco borran el pendiente); volver a la lista o abrir otro proyecto lo descarta.
+T31 hecha: el nombre se edita en la propia pantalla (`QLineEdit` + "Cambiar nombre", se recorta y
+rechaza el vacío) y el botón de finalizado alterna entre "Marcar terminado" y "Marcar en curso" con
+la etiqueta "Terminado" a la vista.
+T28 hecha: `project_view.py` muestra los dos contadores con `+1`/`−1`, guarda en el acto, desactiva
+la bajada en cero y ante un guardado fallido avisa y vuelve al valor anterior. T29 hecha:
+`notes_panel.py` añade notas (la más reciente arriba, fecha `dd/mm/aaaa hh:mm`), edita con
+Guardar/Cancelar conservando la fecha de creación y borra con confirmación; Cancelar restaura el
+texto anterior. T25 hecha: `MainWindow` conmuta entre la lista y el proyecto abierto, `strings.py`
+tiene todos los textos y `__main__.py` arranca con los adaptadores reales (probado a mano en modo
+`offscreen`).
+T26 hecha: la lista muestra estado vacío, nombre, fecha de última modificación y, recortado con
+puntos, el nombre largo en el tooltip; crear con nombre válido lo abre y con nombre en blanco avisa
+sin crear nada. T27 hecha: el terminado lleva la etiqueta "Terminado" y sigue en la lista, y borrar
+pide confirmación mostrando el nombre. Los tests de interfaz usan `pytest-qt` (añadido a las
+dependencias de desarrollo) y arrancan Qt con `QT_QPA_PLATFORM=offscreen` desde `tests/conftest.py`.
+Gitflow comprobado el 2026-10-25: `main` protegida con el check `tests` estricto, sin force-push,
+admin incluido; `dev` sin proteger y con el CI en verde; sin tags porque `v0.1.0` toca al cerrar
+el MVP. Única desviación, aceptada sin reescribir historia: `f68fd32` y `20887c8` agrupan tres
+tareas cada uno y §7 solo admite un par.
+La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
+técnico en `specs/001-crochet-mvp/plan.md`.
+Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
+Problemas conocidos: falta pasar a mano la lista de §8 de la spec en un equipo sin Python (T35);
+el resto del MVP está implementado y `pytest -q` está en verde (276 tests).
+
+## 7. Decisiones cerradas (no reabrir sin motivo)
+- **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el
+  avance; solo se lee y se muestra. Toda operación tiene inversa y no baja de cero.
+- **Local y monousuario**: sin cuentas, sin red, sin telemetría. Funcionar sin conexión es requisito.
+- **Un solo documento de reglas por tema**: `AGENTS.md` = cómo se trabaja (comandos, capas);
+  `docs/constitution.md` = qué no se negocia; `AI_CONTEXT.md` = qué es el repo y en qué estado está.
+- **Sin decisiones abiertas sobre alcance.** Lo que falte por definir se resuelve en la spec, no aquí.
