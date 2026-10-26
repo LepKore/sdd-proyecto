@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle(strings.APP_TITLE)
         self.list_view = ProjectListView(repository, clock, self.open_project)
-        self.project_view = ProjectView(self.show_list)
+        self.project_view = ProjectView(repository, clock, self.show_list)
 
         self.stack = QStackedWidget()
         self.stack.addWidget(self.list_view)
