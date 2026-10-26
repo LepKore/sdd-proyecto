@@ -1,7 +1,8 @@
 """sqlite persistence for projects and notes (RF-1..RF-6, RF-10..RF-15)."""
 
 import sqlite3
-from contextlib import closing
+from collections.abc import Iterator
+from contextlib import closing, contextmanager
 from pathlib import Path
 
 from crochet_tracker.domain.note import Note
@@ -50,9 +51,22 @@ class SqliteProjectRepository:
         connection.execute("PRAGMA foreign_keys = ON")
         return connection
 
+    @contextmanager
+    def _write(self) -> Iterator[sqlite3.Connection]:
+        """Commit here, explicitly: sqlite3's own ``__exit__`` commits in C,
+        bypassing any Python override, which made a failing COMMIT impossible
+        to reproduce in a test (RF-13)."""
+        with closing(self._connect()) as connection:
+            try:
+                yield connection
+            except BaseException:
+                connection.rollback()
+                raise
+            connection.commit()
+
     def add(self, project: Project, now: int) -> int:
         """Insert the project and return its new id."""
-        with closing(self._connect()) as connection, connection:
+        with self._write() as connection:
             cursor = connection.execute(
                 f"INSERT INTO project ({_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (
@@ -85,7 +99,7 @@ class SqliteProjectRepository:
 
     def save(self, project: Project, now: int) -> None:
         """Write every mutable field and bump updated_at (RF-13)."""
-        with closing(self._connect()) as connection, connection:
+        with self._write() as connection:
             connection.execute(
                 "UPDATE project SET name = ?, is_finished = ?, rows_done = ?, knots_done = ?,"
                 " guide_page = ?, guide_file = ?, updated_at = ? WHERE id = ?",
@@ -106,7 +120,7 @@ class SqliteProjectRepository:
         project = self.get(project_id)
         if project is None:
             return
-        with closing(self._connect()) as connection, connection:
+        with self._write() as connection:
             connection.execute("DELETE FROM project WHERE id = ?", (project_id,))
         if project.guide_file:
             # Only the file name is stored; keep it inside the guides folder.
@@ -114,7 +128,7 @@ class SqliteProjectRepository:
 
     def add_note(self, project_id: int, note: Note) -> int:
         """Insert the note and return its new id."""
-        with closing(self._connect()) as connection, connection:
+        with self._write() as connection:
             cursor = connection.execute(
                 "INSERT INTO note (project_id, body, created_at) VALUES (?, ?, ?)",
                 (project_id, note.body, note.created_at),
@@ -133,9 +147,9 @@ class SqliteProjectRepository:
 
     def save_note(self, note: Note) -> None:
         """Only the text changes; the creation time is kept (RF-15)."""
-        with closing(self._connect()) as connection, connection:
+        with self._write() as connection:
             connection.execute("UPDATE note SET body = ? WHERE id = ?", (note.body, note.id))
 
     def delete_note(self, note_id: int) -> None:
-        with closing(self._connect()) as connection, connection:
+        with self._write() as connection:
             connection.execute("DELETE FROM note WHERE id = ?", (note_id,))

@@ -17,15 +17,6 @@ class _FailingCommit(sqlite3.Connection):
     def commit(self) -> None:
         raise sqlite3.OperationalError(MESSAGE)
 
-    def __exit__(self, exc_type, exc, traceback) -> bool:
-        # sqlite3's own __exit__ calls the built-in commit, bypassing this
-        # override, so the failure has to be wired here as well.
-        if exc_type is None:
-            self.commit()
-        else:
-            self.rollback()
-        return False
-
 
 @pytest.fixture
 def db_path(tmp_path):
@@ -42,6 +33,8 @@ def broken(db_path, monkeypatch):
     """A second repository on the same file where every write fails at COMMIT time."""
 
     def connect():
+        # sqlite3.Connection is immutable, so commit() can only be overridden
+        # in a subclass passed as factory.
         connection = sqlite3.connect(db_path, factory=_FailingCommit)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
