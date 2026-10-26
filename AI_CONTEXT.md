@@ -32,8 +32,10 @@ en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve sol
 `clock.py` (`SystemClock.now()`, segundos).
 `crochet_tracker/application/` — existe: `ports.py` (`ProjectRepository`, `GuideStore` y `Clock` como
 `Protocol`), `errors.py` (`SaveFailed`), casos de uso `create_project.py`, `list_projects.py`,
-`open_project.py`, `rename_project.py`, `set_finished.py`, `delete_project.py` y `counters.py`;
-los dobles en memoria viven en `tests/application/fakes.py`. Falta `presentation/`.
+`open_project.py`, `rename_project.py`, `set_finished.py`, `delete_project.py`, `counters.py`,
+`notes.py`, `attach_guide.py`, `change_page.py` y `undo_last_change.py` (`can_undo` y
+`undo_last_change`); los dobles en memoria viven en `tests/application/fakes.py`. Falta
+`presentation/`.
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
@@ -79,13 +81,20 @@ como el repositorio real. T20 hecha: casos de uso de proyecto (crear, listar, ab
 marcar terminado, borrar); abrir no reordena la lista. T21 hecha: `counters.py` con
 `add_rows`/`remove_rows`/`add_knots`/`remove_knots`, guardado inmediato, nada se escribe al bajar de
 cero (CL-17) y un guardado fallido deja los contadores como estaban y lanza `SaveFailed` (RF-13).
-Siguiente paso: T22 (casos de uso de notas), luego T23 (deshacer) y T24 (guía y página).
+T22 hecha: `notes.py` con `add_note`, `edit_note` y `delete_note`; el texto se conserva si el
+guardado falla y editar mantiene la fecha de creación. T23 hecha: `undo_last_change.py`; los
+contadores y las notas registran el inverso en `Undo` solo si el guardado salió bien, y deshacer no
+es deshacible. Queda en manos de la vista llamar a `undo.discard()` al volver a la lista o abrir
+otro proyecto. T24 hecha: `attach_guide.py` (no admite una segunda guía; si falla el guardado deja
+el proyecto sin guía) y `change_page.py` (persiste la página, no pasa del tope conocido y no escribe
+si la página no cambia).
+Siguiente paso: T25 (ventana principal y navegación, con `presentation/`).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
 Problemas conocidos: aún no existe la capa `presentation/`, así que la aplicación todavía no se
 puede ejecutar; `application/` y la persistencia solo se ejercitan desde los tests.
-`pytest -q` está en verde (140 tests).
+`pytest -q` está en verde (173 tests).
 
 ## 7. Decisiones cerradas (no reabrir sin motivo)
 - **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el

@@ -111,17 +111,17 @@
   - Hecho cuando: si el repositorio falla al guardar, el caso de uso devuelve el valor anterior con
     un error tipado que la vista puede mostrar (RF-13).
 
-- [ ] **T22 — Casos de uso de notas** (RF-14, RF-15)
+- [x] **T22 — Casos de uso de notas** (RF-14, RF-15)
   - Archivos: `application/notes.py`, `tests/application/test_notes.py`.
   - Hecho cuando: añadir, editar y borrar se prueban con los dobles, incluido el fallo al guardar
     (CL-31: se conserva el texto y se informa).
 
-- [ ] **T23 — Caso de uso deshacer** (RF-16)
+- [x] **T23 — Caso de uso deshacer** (RF-16)
   - Archivos: `application/undo_last_change.py`, `tests/application/test_undo.py`.
   - Hecho cuando: deshace el último cambio de contador o nota, se descarta al cambiar de proyecto y
     no ofrece nada pasados los 10 minutos.
 
-- [ ] **T24 — Casos de uso de guía y página** (RF-8, RF-9, RF-10)
+- [x] **T24 — Casos de uso de guía y página** (RF-8, RF-9, RF-10)
   - Archivos: `application/attach_guide.py`, `application/change_page.py`,
     `tests/application/test_guide.py`.
   - Hecho cuando: adjuntar una guía a un proyecto que ya tiene una no hace nada, y cambiar de
