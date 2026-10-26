@@ -36,10 +36,11 @@ en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve sol
 `notes.py`, `attach_guide.py`, `change_page.py` y `undo_last_change.py` (`can_undo` y
 `undo_last_change`); los dobles en memoria viven en `tests/application/fakes.py`.
 `crochet_tracker/presentation/` — existe: `strings.py` (todos los textos en español),
-`main_window.py` (`MainWindow`: lista o proyecto abierto, uno cada vez), `project_list_view.py`
+`main_window.py` (`MainWindow`: lista o proyecto abierto, uno cada vez; arranca con un tamaño
+recortado a la pantalla y no crece con el PDF), `project_list_view.py`
 (lista con estado vacío, crear, etiqueta "Terminado" y borrado con confirmación), `project_view.py`
 (nombre editable con "Cambiar nombre", estado terminado, contadores de filas y nudos con `+1`/`−1`,
-aviso de deshacer y el panel de notas), `notes_panel.py` (`NotesPanel`: alta, edición con
+aviso de deshacer y la guía con el panel de notas a la derecha), `notes_panel.py` (`NotesPanel`: alta, edición con
 Guardar/Cancelar y borrado con confirmación) y `guide_view.py` (`GuideView`: render de la página con
 pypdfium2, adjuntar la guía y pasar de página).
 `crochet_tracker/infrastructure/single_instance.py` — `QLockFile` en `<datos>/app.lock`.

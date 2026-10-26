@@ -1,15 +1,17 @@
 """Guide on screen: the saved page, its limits and unreadable files (RF-8, RF-9, RF-10, T34)."""
 
 import pytest
-from PySide6.QtWidgets import QFileDialog, QMessageBox
+from PySide6.QtCore import QPoint, QPointF, Qt
+from PySide6.QtGui import QWheelEvent
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 
 from crochet_tracker.application.create_project import create_project
 from crochet_tracker.presentation import guide_view, strings
 from crochet_tracker.presentation.guide_view import GuideView
 
 
-def build_pdf(pages: int) -> bytes:
-    """A tiny but valid PDF with `pages` empty pages."""
+def build_pdf(pages: int, width: int = 200, height: int = 300) -> bytes:
+    """A tiny but valid PDF with `pages` empty pages of that size in points."""
     kids = " ".join(f"{3 + 2 * i} 0 R" for i in range(pages))
     parts = [
         "<< /Type /Catalog /Pages 2 0 R >>",
@@ -17,7 +19,7 @@ def build_pdf(pages: int) -> bytes:
     ]
     for index in range(pages):
         parts.append(
-            f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 300] "
+            f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {width} {height}] "
             f"/Contents {4 + 2 * index} 0 R >>"
         )
         parts.append("<< /Length 0 >>\nstream\n\nendstream")
@@ -242,3 +244,61 @@ def test_a_project_with_a_guide_does_not_offer_another(
     view.set_project(with_guide(repository, clock, guides, pdf))
 
     assert view.attach_button.isHidden() is True
+
+
+def test_a_page_keeps_its_size_inside_the_scroll_area(
+    view, repository, clock, guides, pdf
+) -> None:
+    view.resize(200, 200)
+
+    view.set_project(with_guide(repository, clock, guides, pdf))
+
+    assert view.image_label.size() == view.image_label.pixmap().size()
+
+
+def test_a_page_taller_than_the_view_scrolls_with_the_bar_and_the_wheel(
+    view, repository, clock, guides, pdf
+) -> None:
+    view.resize(200, 200)
+    view.set_project(with_guide(repository, clock, guides, pdf))
+    _show(view)
+    bar = view.scroll.verticalScrollBar()
+
+    assert bar.maximum() > 0
+    assert bar.value() == 0
+
+    QApplication.sendEvent(view.scroll.viewport(), _one_wheel_step_down())
+
+    assert bar.value() > 0
+
+
+def test_a_new_page_starts_at_the_top(view, repository, clock, guides, pdf) -> None:
+    view.resize(200, 200)
+    view.set_project(with_guide(repository, clock, guides, pdf))
+    _show(view)
+    bar = view.scroll.verticalScrollBar()
+    bar.setValue(bar.maximum())
+
+    view.next_button.click()
+
+    assert bar.value() == 0
+
+
+def _show(view) -> None:
+    """Scroll bars only get their range once the widget is on screen."""
+    view.show()
+    QApplication.processEvents()
+
+
+def _one_wheel_step_down() -> QWheelEvent:
+    return QWheelEvent(
+        QPointF(10, 10),
+        QPointF(10, 10),
+        QPoint(),
+        QPoint(0, -120),
+        Qt.MouseButton.NoButton,
+        Qt.KeyboardModifier.NoModifier,
+        Qt.ScrollPhase.NoScrollPhase,
+        False,
+    )
+

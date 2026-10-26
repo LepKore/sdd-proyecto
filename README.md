@@ -8,7 +8,8 @@ guía en PDF: cuenta filas y nudos, guarda notas y recuerda la página en la que
 1. Abre la aplicación: verás la lista de proyectos.
 2. «Nuevo proyecto» pide un nombre (hasta 100 caracteres) y lo abre.
 3. En la ficha del proyecto: `+1`/`−1` en Filas y Nudos, «Añadir guía» para elegir el PDF,
-   «← Página anterior» / «Página siguiente →» para recorrerlo y el panel de notas abajo.
+   «← Página anterior» / «Página siguiente →» para recorrerlo (con la barra o la rueda del ratón)
+   y el panel de notas a la derecha.
 4. Todo se guarda al instante; no hay botón de guardar ni diálogo al cerrar.
 5. «← Proyectos» vuelve a la lista. Borrar un proyecto se hace desde la lista y pide confirmación.
 

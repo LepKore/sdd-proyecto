@@ -27,6 +27,7 @@ from crochet_tracker.presentation.guide_view import GuideView
 from crochet_tracker.presentation.notes_panel import NotesPanel
 
 CHECK_UNDO_EVERY_MS = 30_000
+NOTES_WIDTH = 340
 
 
 class ProjectView(QWidget):
@@ -75,19 +76,24 @@ class ProjectView(QWidget):
         undo_row.addWidget(self.undo_label, 1)
         undo_row.addWidget(self.undo_button)
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.back_button)
-        layout.addLayout(name_row)
-        layout.addLayout(state_row)
-        layout.addLayout(
+        left = QVBoxLayout()
+        left.addWidget(self.back_button)
+        left.addLayout(name_row)
+        left.addLayout(state_row)
+        left.addLayout(
             _counter_row(strings.ROWS, self.rows_label, self.rows_down, self.rows_up)
         )
-        layout.addLayout(
+        left.addLayout(
             _counter_row(strings.KNOTS, self.knots_label, self.knots_down, self.knots_up)
         )
-        layout.addLayout(undo_row)
-        layout.addWidget(self.guide_view, 2)
-        layout.addWidget(self.notes_panel, 1)
+        left.addLayout(undo_row)
+        left.addWidget(self.guide_view, 1)
+
+        self.notes_panel.setFixedWidth(NOTES_WIDTH)
+
+        layout = QHBoxLayout(self)
+        layout.addLayout(left, 1)
+        layout.addWidget(self.notes_panel)
 
         self._undo_timer = QTimer(self)
         self._undo_timer.setInterval(CHECK_UNDO_EVERY_MS)

@@ -7,6 +7,7 @@ moment the user moves (RF-10), and a page that cannot be drawn only spoils itsel
 from pathlib import Path
 
 import pypdfium2 as pdfium
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
     QFileDialog,
@@ -14,6 +15,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QMessageBox,
     QPushButton,
+    QScrollArea,
     QVBoxLayout,
     QWidget,
 )
@@ -26,6 +28,7 @@ from crochet_tracker.domain.project import Project
 from crochet_tracker.presentation import strings
 
 RENDER_SCALE = 2
+FAILED_SIZE = 320
 
 
 def render_page(document: pdfium.PdfDocument, index: int) -> QPixmap:
@@ -65,6 +68,12 @@ class GuideView(QWidget):
         self.next_button = QPushButton(strings.NEXT_PAGE)
         self.page_label = QLabel()
         self.image_label = QLabel()
+        self.scroll = QScrollArea()
+        self.scroll.setWidget(self.image_label)
+        self.scroll.setWidgetResizable(False)
+        self.scroll.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
         controls = QHBoxLayout()
         controls.addWidget(self.previous_button)
@@ -78,7 +87,7 @@ class GuideView(QWidget):
         layout.addWidget(self.attach_button)
         layout.addWidget(self.notice_label)
         layout.addLayout(controls)
-        layout.addWidget(self.image_label, 1)
+        layout.addWidget(self.scroll, 1)
 
         self.attach_button.clicked.connect(lambda: self.attach())
         self.previous_button.clicked.connect(lambda: self.move(-1))
@@ -150,7 +159,7 @@ class GuideView(QWidget):
         self.previous_button.setVisible(has_guide)
         self.next_button.setVisible(has_guide)
         self.page_label.setVisible(has_guide)
-        self.image_label.setVisible(has_guide)
+        self.scroll.setVisible(has_guide)
         if not has_guide or self._project is None:
             self.image_label.clear()
             return
@@ -161,11 +170,17 @@ class GuideView(QWidget):
         self._draw(page - 1)
 
     def _draw(self, index: int) -> None:
+        # The label keeps the size of the page, so the scroll bars know how far they go.
         try:
-            self.image_label.setPixmap(render_page(self._document, index))
+            pixmap = render_page(self._document, index)
         except Exception:  # a single broken page must not block the rest (CL-14)
             self.image_label.setPixmap(QPixmap())
             self.image_label.setText(strings.PAGE_FAILED)
+            self.image_label.setFixedSize(FAILED_SIZE, FAILED_SIZE)
+            return
+        self.image_label.setPixmap(pixmap)
+        self.image_label.setFixedSize(pixmap.size())
+        self.scroll.verticalScrollBar().setValue(0)
 
     def _close(self) -> None:
         if self._document is not None:
