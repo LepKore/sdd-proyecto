@@ -89,6 +89,10 @@ otro proyecto. T24 hecha: `attach_guide.py` (no admite una segunda guía; si fal
 el proyecto sin guía) y `change_page.py` (persiste la página, no pasa del tope conocido y no escribe
 si la página no cambia).
 Siguiente paso: T25 (ventana principal y navegación, con `presentation/`).
+Gitflow comprobado el 2026-10-25: `main` protegida con el check `tests` estricto, sin force-push,
+admin incluido; `dev` sin proteger y con el CI en verde; sin tags porque `v0.1.0` toca al cerrar
+el MVP. Única desviación, aceptada sin reescribir historia: `f68fd32` y `20887c8` agrupan tres
+tareas cada uno y §7 solo admite un par.
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).

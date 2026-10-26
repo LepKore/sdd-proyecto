@@ -5,8 +5,9 @@ Aplicación de escritorio en Python para registrar el avance de un tejido a croc
 siguiendo una guía en PDF: cuenta nudos y filas realizadas y guarda el progreso por
 proyecto para retomarlo después.
 
-Estado: repositorio vacío (solo `README.md`). Todavía no hay código, specs ni tooling;
-las secciones de abajo describen el destino, no lo ya construido.
+Estado: MVP en construcción. Hechas las capas `domain/`, `infrastructure/` y `application/`
+con sus tests (173 en verde); falta `presentation/` y el empaquetado, así que la aplicación
+todavía no se puede ejecutar.
 
 ## Stack (decidido)
 - UI: **PySide6** (Qt, LGPL: válida para distribuir el `.exe`).
@@ -19,13 +20,12 @@ Reparto: `presentation/` usa Qt; `infrastructure/` contiene el adaptador de pypd
 el repositorio sqlite3; `domain/` y `application/` no importan ninguna de las tres.
 
 ## Comandos
-Aún no hay código, así que nada de esto está verificado todavía. Forma prevista al crear
-el paquete `crochet_tracker/` (ajusta el nombre real cuando exista):
+Verificados salvo donde se indica (Python 3.12+; en esta máquina hay un `.venv` con 3.13):
 - Instalar: `pip install -e .[dev]`
-- Ejecutar: `python -m crochet_tracker`
+- Ejecutar: `python -m crochet_tracker` (previsto; `__main__.py` llega con T25/T33)
 - Tests: `pytest -q`
-- Un solo test: `pytest -q tests/test_<modulo>.py::test_<caso>`
-- Empaquetar: `pyinstaller --windowed --name CrochetTracker -m crochet_tracker`
+- Un solo test: `pytest -q tests/<capa>/test_<modulo>.py::test_<caso>`
+- Empaquetar: `pyinstaller --windowed --name CrochetTracker -m crochet_tracker` (previsto)
 
 ## Git workflow
 - `dev` es la rama de trabajo; `main` solo recibe el MVP, por PR. Los commits y su formato están
@@ -36,6 +36,8 @@ el paquete `crochet_tracker/` (ajusta el nombre real cuando exista):
   check obligatorio, sin pushes directos y sin force-push.
 - Antes de cada push: `pytest -q` en local con el mismo Python 3.12.
 - Al cerrar el MVP: PR `dev → main`, merge y `git tag -a v0.1.0 -m "MVP"`.
+- Historia conocida: `f68fd32` y `20887c8` agrupan tres tareas cada uno (T19–T21 y T22–T24),
+  más de lo que admite el «par» de §7. Se decidió no reescribir `dev` ya pusheado; no se repite.
 
 ## Arquitectura (capas)
 Las dependencias apuntan siempre hacia dentro; una capa externa puede importar a la
