@@ -33,7 +33,7 @@
   - Hecho cuando: alternar el estado dos veces deja el valor inicial y contar en un proyecto
     terminado no cambia su estado (CL-28).
 
-- [ ] **T06 — Página de la guía** (RF-10)
+- [x] **T06 — Página de la guía** (RF-10)
   - Archivos: `domain/project.py`, `tests/domain/test_page.py`.
   - Hecho cuando: la página nunca baja de 1 y, sabiendo el total de páginas, se recorta a ese total.
 

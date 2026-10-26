@@ -33,9 +33,11 @@ class Project:
     rows_done: int = 0
     knots_done: int = 0
     is_finished: bool = False
+    guide_page: int = 1
 
     def __post_init__(self) -> None:
         self.name = normalize_name(self.name)
+        self.guide_page = max(1, self.guide_page)
 
     def change_rows(self, delta: int) -> None:
         self.rows_done = max(0, self.rows_done + delta)
@@ -45,3 +47,10 @@ class Project:
 
     def toggle_finished(self) -> None:
         self.is_finished = not self.is_finished
+
+    def change_page(self, delta: int, total_pages: int | None = None) -> None:
+        """Move the remembered page; never below 1 nor past the last known page (RF-10)."""
+        page = max(1, self.guide_page + delta)
+        if total_pages is not None:
+            page = min(page, max(1, total_pages))
+        self.guide_page = page
