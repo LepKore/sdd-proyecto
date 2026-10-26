@@ -145,12 +145,12 @@
   - Hecho cuando: un proyecto terminado se distingue sin desaparecer, y borrar pide confirmación
     con su nombre y solo borra al confirmar.
 
-- [ ] **T28 — Contadores en pantalla** (RF-11, RF-12, RF-13)
+- [x] **T28 — Contadores en pantalla** (RF-11, RF-12, RF-13)
   - Archivos: `presentation/project_view.py`, `tests/presentation/test_counters_view.py`.
   - Hecho cuando: `+1`/`-1` cambian el número sin espera perceptible, el botón de bajar está inactivo
     en cero (CL-17) y un fallo de guardado muestra aviso y vuelve al valor anterior.
 
-- [ ] **T29 — Panel de notas** (RF-14, RF-15)
+- [x] **T29 — Panel de notas** (RF-14, RF-15)
   - Archivos: `presentation/notes_panel.py`, `tests/presentation/test_notes_panel.py`.
   - Hecho cuando: se añade una nota, se edita con Guardar/Cancelar, se borra con confirmación, y
     Cancelar deja el texto anterior (CL-23).

@@ -37,9 +37,11 @@ en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve sol
 `undo_last_change`); los dobles en memoria viven en `tests/application/fakes.py`.
 `crochet_tracker/presentation/` — existe: `strings.py` (todos los textos en español),
 `main_window.py` (`MainWindow`: lista o proyecto abierto, uno cada vez), `project_list_view.py`
-(lista con estado vacío, crear, etiqueta "Terminado" y borrado con confirmación) y `project_view.py`
-(por ahora solo nombre y botón de volver). `crochet_tracker/__main__.py` arranca con los adaptadores
-reales; todavía sin argumentos ni códigos de salida (T33).
+(lista con estado vacío, crear, etiqueta "Terminado" y borrado con confirmación), `project_view.py`
+(nombre, contadores de filas y nudos con `+1`/`−1` y el panel de notas) y `notes_panel.py`
+(`NotesPanel`: alta, edición con Guardar/Cancelar y borrado con confirmación).
+`crochet_tracker/__main__.py` arranca con los adaptadores reales; todavía sin argumentos ni códigos
+de salida (T33).
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
@@ -92,9 +94,14 @@ es deshacible. Queda en manos de la vista llamar a `undo.discard()` al volver a 
 otro proyecto. T24 hecha: `attach_guide.py` (no admite una segunda guía; si falla el guardado deja
 el proyecto sin guía) y `change_page.py` (persiste la página, no pasa del tope conocido y no escribe
 si la página no cambia).
-Siguiente paso: T28 (contadores en pantalla, que amplía `project_view.py`).
-T25 hecha: `MainWindow` conmuta entre la lista y el proyecto abierto, `strings.py` tiene todos los
-textos y `__main__.py` arranca con los adaptadores reales (probado a mano en modo `offscreen`).
+Siguiente paso: T30 (deshacer en pantalla sobre el `Undo` que ya comparten contadores y notas).
+T28 hecha: `project_view.py` muestra los dos contadores con `+1`/`−1`, guarda en el acto, desactiva
+la bajada en cero y ante un guardado fallido avisa y vuelve al valor anterior. T29 hecha:
+`notes_panel.py` añade notas (la más reciente arriba, fecha `dd/mm/aaaa hh:mm`), edita con
+Guardar/Cancelar conservando la fecha de creación y borra con confirmación; Cancelar restaura el
+texto anterior. T25 hecha: `MainWindow` conmuta entre la lista y el proyecto abierto, `strings.py`
+tiene todos los textos y `__main__.py` arranca con los adaptadores reales (probado a mano en modo
+`offscreen`).
 T26 hecha: la lista muestra estado vacío, nombre, fecha de última modificación y, recortado con
 puntos, el nombre largo en el tooltip; crear con nombre válido lo abre y con nombre en blanco avisa
 sin crear nada. T27 hecha: el terminado lleva la etiqueta "Terminado" y sigue en la lista, y borrar
@@ -107,8 +114,9 @@ tareas cada uno y §7 solo admite un par.
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
-Problemas conocidos: `project_view.py` solo muestra el nombre; contadores, notas, guía y deshacer
-llegan en T28–T31, así que la ventana todavía no permite tejer. `pytest -q` está en verde (199 tests).
+Problemas conocidos: falta el deshacer en pantalla (T30), la ficha del proyecto (T31), la instancia
+única y el arranque definitivo (T32–T33), el visor del PDF (T34) y el empaquetado (T35), así que
+todavía no se puede tejer con una guía. `pytest -q` está en verde (223 tests).
 
 ## 7. Decisiones cerradas (no reabrir sin motivo)
 - **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el

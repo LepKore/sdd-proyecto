@@ -6,8 +6,8 @@ siguiendo una guía en PDF: cuenta nudos y filas realizadas y guarda el progreso
 proyecto para retomarlo después.
 
 Estado: MVP en construcción. Hechas las capas `domain/`, `infrastructure/` y `application/`
-con sus tests (199 en verde) y la lista de proyectos de `presentation/`; falta el resto de la
-interfaz (contadores, notas, guía, deshacer) y el empaquetado, así que todavía no se puede tejer.
+con sus tests (223 en verde) y la lista, los contadores y las notas de `presentation/`; faltan
+nombre/estado, deshacer, guía, empaquetado y el cierre del MVP.
 
 ## Stack (decidido)
 - UI: **PySide6** (Qt, LGPL: válida para distribuir el `.exe`).
