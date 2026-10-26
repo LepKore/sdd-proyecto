@@ -64,14 +64,35 @@ def test_deleting_asks_with_the_project_name(
     assert confirmations == ["Amigurumi pulpo"]
 
 
-def test_refresh_selects_the_first_project_for_actions(
-    window, repository, clock, confirmations
-) -> None:
+def test_delete_button_remains_available_for_a_project(window, repository, clock) -> None:
     create_project(repository, clock, "Bufanda")
     window.list_view.refresh()
 
     assert window.list_view.list_widget.currentRow() == 0
     assert window.list_view.delete_button.isEnabled()
+
+
+def test_delete_button_recovers_when_qt_loses_the_selection(
+    window, repository, clock, confirmations
+) -> None:
+    create_project(repository, clock, "Bufanda")
+    window.list_view.refresh()
+    window.list_view.list_widget.clearSelection()
+
+    window.list_view.delete()
+
+    assert confirmations == ["Bufanda"]
+
+
+def test_clicking_delete_button_opens_the_confirmation(
+    window, repository, clock, confirmations
+) -> None:
+    create_project(repository, clock, "Bufanda")
+    window.list_view.refresh()
+
+    window.list_view.delete_button.click()
+
+    assert confirmations == ["Bufanda"]
 
 
 def test_cancelling_keeps_the_project(window, repository, clock, confirmations) -> None:

@@ -84,7 +84,6 @@ class ProjectListView(QWidget):
         self.new_button.clicked.connect(lambda: self.create())
         self.delete_button.clicked.connect(lambda: self.delete())
         self.list_widget.itemActivated.connect(lambda _item: self.open_selected())
-        self.list_widget.itemSelectionChanged.connect(self._update_delete_button)
 
         self.refresh()
 
@@ -101,7 +100,6 @@ class ProjectListView(QWidget):
         self.list_widget.setVisible(bool(self._projects))
         if self._projects:
             self.list_widget.setCurrentRow(0)
-        self._update_delete_button()
 
     def create(self) -> None:
         """Create the project and open it; a blank name changes nothing (CL-1)."""
@@ -130,12 +128,11 @@ class ProjectListView(QWidget):
         delete_project(self._repository, project.id)
         self.refresh()
 
-    def _update_delete_button(self) -> None:
-        """Without a chosen project there is nothing to ask about, so the button waits."""
-        self.delete_button.setEnabled(self._current() is not None)
-
     def _current(self) -> Project | None:
         item = self.list_widget.currentItem()
+        if item is None and self.list_widget.count():
+            self.list_widget.setCurrentRow(0)
+            item = self.list_widget.currentItem()
         if item is None:
             return None
         project_id = item.data(Qt.ItemDataRole.UserRole)
