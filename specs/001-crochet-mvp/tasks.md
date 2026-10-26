@@ -37,7 +37,7 @@
   - Archivos: `domain/project.py`, `tests/domain/test_page.py`.
   - Hecho cuando: la página nunca baja de 1 y, sabiendo el total de páginas, se recorta a ese total.
 
-- [ ] **T07 — Notas** (RF-14, RF-15)
+- [x] **T07 — Notas** (RF-14, RF-15)
   - Archivos: `domain/note.py`, `tests/domain/test_note.py`.
   - Hecho cuando: se rechaza el texto vacío o solo espacios (CL-19), y editar conserva la fecha de
     creación original.
