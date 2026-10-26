@@ -64,13 +64,14 @@ def test_deleting_asks_with_the_project_name(
     assert confirmations == ["Amigurumi pulpo"]
 
 
-def test_deleting_nothing_asks_nothing(window, repository, clock, confirmations) -> None:
+def test_refresh_selects_the_first_project_for_actions(
+    window, repository, clock, confirmations
+) -> None:
     create_project(repository, clock, "Bufanda")
     window.list_view.refresh()
 
-    window.list_view.delete()
-
-    assert confirmations == []
+    assert window.list_view.list_widget.currentRow() == 0
+    assert window.list_view.delete_button.isEnabled()
 
 
 def test_cancelling_keeps_the_project(window, repository, clock, confirmations) -> None:
