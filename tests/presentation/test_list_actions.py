@@ -84,6 +84,20 @@ def test_delete_button_recovers_when_qt_loses_the_selection(
     assert confirmations == ["Bufanda"]
 
 
+def test_delete_button_keeps_the_selected_project_when_qt_loses_focus(
+    window, repository, clock, confirmations
+) -> None:
+    create_project(repository, clock, "Bufanda")
+    create_project(repository, clock, "Amigurumi")
+    window.list_view.refresh()
+    window.list_view.list_widget.setCurrentRow(1)
+    window.list_view.list_widget.clearSelection()
+
+    window.list_view.delete()
+
+    assert confirmations == ["Bufanda"]
+
+
 def test_clicking_delete_button_opens_the_confirmation(
     window, repository, clock, confirmations
 ) -> None:

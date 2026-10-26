@@ -64,6 +64,7 @@ class ProjectListView(QWidget):
         self._clock = clock
         self._on_open = on_open
         self._projects: list[Project] = []
+        self._selected_project_id: int | None = None
 
         self.empty_label = QLabel(strings.EMPTY_LIST)
         self.list_widget = QListWidget()
@@ -84,6 +85,7 @@ class ProjectListView(QWidget):
         self.new_button.clicked.connect(lambda: self.create())
         self.delete_button.clicked.connect(lambda: self.delete())
         self.list_widget.itemActivated.connect(lambda _item: self.open_selected())
+        self.list_widget.currentItemChanged.connect(self._remember_selection)
 
         self.refresh()
 
@@ -100,6 +102,9 @@ class ProjectListView(QWidget):
         self.list_widget.setVisible(bool(self._projects))
         if self._projects:
             self.list_widget.setCurrentRow(0)
+            self._selected_project_id = self._projects[0].id
+        else:
+            self._selected_project_id = None
 
     def create(self) -> None:
         """Create the project and open it; a blank name changes nothing (CL-1)."""
@@ -130,13 +135,18 @@ class ProjectListView(QWidget):
 
     def _current(self) -> Project | None:
         item = self.list_widget.currentItem()
-        if item is None and self.list_widget.count():
-            self.list_widget.setCurrentRow(0)
-            item = self.list_widget.currentItem()
-        if item is None:
+        project_id = (
+            item.data(Qt.ItemDataRole.UserRole)
+            if item is not None
+            else self._selected_project_id
+        )
+        if project_id is None:
             return None
-        project_id = item.data(Qt.ItemDataRole.UserRole)
         return next((p for p in self._projects if p.id == project_id), None)
+
+    def _remember_selection(self, current: QListWidgetItem | None, _previous) -> None:
+        if current is not None:
+            self._selected_project_id = current.data(Qt.ItemDataRole.UserRole)
 
     @staticmethod
     def _row_text(project: Project) -> str:
