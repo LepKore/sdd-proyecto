@@ -59,7 +59,7 @@
   - Hecho cuando: con `CROCHET_TRACKER_DATA` definida se usa esa ruta; sin ella se usa la del
     usuario; y la carpeta se crea si no existe.
 
-- [ ] **T11 — Esquema y migración** (constitución §5)
+- [x] **T11 — Esquema y migración** (constitución §5)
   - Archivos: `infrastructure/migrations.py`, `tests/infrastructure/test_migrations.py`.
   - Hecho cuando: una base creada a mano con `user_version = 0` migra a 1, deja `crochet.db.bak`,
     y un paso que falla hace `ROLLBACK` sin tocar los datos.

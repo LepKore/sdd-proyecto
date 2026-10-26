@@ -24,8 +24,10 @@ Detalle y reparto de responsabilidades: `AGENTS.md`.
 `crochet_tracker/domain/` — existe: `errors.py` (jerarquía `DomainError`), `project.py`
 (`normalize_name` y la entidad `Project` con nombre, contadores, estado terminado y página) y
 `note.py` (entidad `Note`: texto y fecha de creación conservada al editar) y `undo.py` (`Undo`:
-un solo paso, caducidad de 10 minutos, el inverso es un `Callable`). Faltan `application/`,
-`infrastructure/` y `presentation/`.
+un solo paso, caducidad de 10 minutos, el inverso es un `Callable`).
+`crochet_tracker/infrastructure/` — existe: `app_paths.py` (carpeta de datos, override por
+`CROCHET_TRACKER_DATA`) y `migrations.py` (esquema v1 y migración con copia `.bak`). Faltan
+`application/` y `presentation/`.
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
@@ -54,7 +56,9 @@ vacío y de más de 100 caracteres, nombres repetidos permitidos). T04 y T05 hec
 página conocida). T07 hecha: `note.py` con `Note(body, created_at)` y `edit` que conserva la fecha.
 T08 y T09 hechas: `undo.py` con `Undo` (una entrada, caducidad de 10 min medida con `now`
 inyectado, sin rehacer) y `restore_rows`/`restore_knots` en `Project` para el inverso.
-Siguiente paso: T10 (carpeta de datos).
+T10 hecha: `app_paths.data_dir()`. T11 hecha: `migrations.migrate()` (v0 → v1, copia
+`crochet.db.bak`, paso fallido con `ROLLBACK`, base más nueva rechazada con `MigrationError`).
+Siguiente paso: T12 (repositorio: crear, listar y abrir).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
