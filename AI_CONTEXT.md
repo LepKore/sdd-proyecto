@@ -34,14 +34,18 @@ en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve sol
 `Protocol`), `errors.py` (`SaveFailed`), casos de uso `create_project.py`, `list_projects.py`,
 `open_project.py`, `rename_project.py`, `set_finished.py`, `delete_project.py`, `counters.py`,
 `notes.py`, `attach_guide.py`, `change_page.py` y `undo_last_change.py` (`can_undo` y
-`undo_last_change`); los dobles en memoria viven en `tests/application/fakes.py`. Falta
-`presentation/`.
+`undo_last_change`); los dobles en memoria viven en `tests/application/fakes.py`.
+`crochet_tracker/presentation/` — existe: `strings.py` (todos los textos en español),
+`main_window.py` (`MainWindow`: lista o proyecto abierto, uno cada vez), `project_list_view.py`
+(lista con estado vacío, crear, etiqueta "Terminado" y borrado con confirmación) y `project_view.py`
+(por ahora solo nombre y botón de volver). `crochet_tracker/__main__.py` arranca con los adaptadores
+reales; todavía sin argumentos ni códigos de salida (T33).
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
 Inicialización: `pip install -e .[dev]` (`pyproject.toml` ya existe).
-Desarrollo: `python -m crochet_tracker` (previsto).
-Testing: `pytest -q`; un solo test: `pytest -q tests/test_<modulo>.py::test_<caso>`.
+Desarrollo: `python -m crochet_tracker` (arranca; todavía sin argumentos ni códigos de salida).
+Testing: `pytest -q` (incluye `pytest-qt`); un solo test: `pytest -q tests/<capa>/test_<modulo>.py::test_<caso>`.
 Lint / typecheck: no configurado todavía.
 Deploy: `pyinstaller --windowed --name CrochetTracker -m crochet_tracker` (informativo; requiere confirmación).
 
@@ -88,7 +92,14 @@ es deshacible. Queda en manos de la vista llamar a `undo.discard()` al volver a 
 otro proyecto. T24 hecha: `attach_guide.py` (no admite una segunda guía; si falla el guardado deja
 el proyecto sin guía) y `change_page.py` (persiste la página, no pasa del tope conocido y no escribe
 si la página no cambia).
-Siguiente paso: T25 (ventana principal y navegación, con `presentation/`).
+Siguiente paso: T28 (contadores en pantalla, que amplía `project_view.py`).
+T25 hecha: `MainWindow` conmuta entre la lista y el proyecto abierto, `strings.py` tiene todos los
+textos y `__main__.py` arranca con los adaptadores reales (probado a mano en modo `offscreen`).
+T26 hecha: la lista muestra estado vacío, nombre, fecha de última modificación y, recortado con
+puntos, el nombre largo en el tooltip; crear con nombre válido lo abre y con nombre en blanco avisa
+sin crear nada. T27 hecha: el terminado lleva la etiqueta "Terminado" y sigue en la lista, y borrar
+pide confirmación mostrando el nombre. Los tests de interfaz usan `pytest-qt` (añadido a las
+dependencias de desarrollo) y arrancan Qt con `QT_QPA_PLATFORM=offscreen` desde `tests/conftest.py`.
 Gitflow comprobado el 2026-10-25: `main` protegida con el check `tests` estricto, sin force-push,
 admin incluido; `dev` sin proteger y con el CI en verde; sin tags porque `v0.1.0` toca al cerrar
 el MVP. Única desviación, aceptada sin reescribir historia: `f68fd32` y `20887c8` agrupan tres
@@ -96,9 +107,8 @@ tareas cada uno y §7 solo admite un par.
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).
-Problemas conocidos: aún no existe la capa `presentation/`, así que la aplicación todavía no se
-puede ejecutar; `application/` y la persistencia solo se ejercitan desde los tests.
-`pytest -q` está en verde (173 tests).
+Problemas conocidos: `project_view.py` solo muestra el nombre; contadores, notas, guía y deshacer
+llegan en T28–T31, así que la ventana todavía no permite tejer. `pytest -q` está en verde (199 tests).
 
 ## 7. Decisiones cerradas (no reabrir sin motivo)
 - **Conteo manual**: el usuario marca nudos y filas con botones `+1`/`-1`. El PDF no calcula el

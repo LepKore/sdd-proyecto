@@ -129,18 +129,18 @@
 
 ## E. Presentación
 
-- [ ] **T25 — Ventana principal y navegación** (RF-2, RF-3)
+- [x] **T25 — Ventana principal y navegación** (RF-2, RF-3)
   - Archivos: `presentation/main_window.py`, `presentation/strings.py`, `crochet_tracker/__main__.py`
     (provisional), `tests/presentation/test_navigation.py`.
   - Hecho cuando: se abre la lista, se entra a un proyecto y "← Proyectos" vuelve, y todos los
     textos visibles están en español.
 
-- [ ] **T26 — Lista, estado vacío y crear** (RF-1, RF-2)
+- [x] **T26 — Lista, estado vacío y crear** (RF-1, RF-2)
   - Archivos: `presentation/project_list_view.py`, `tests/presentation/test_list.py`.
   - Hecho cuando: sin proyectos se ve el estado vacío; crear con nombre válido lo abre; con nombre
     vacío avisa y no crea (CL-1, CL-27).
 
-- [ ] **T27 — Etiqueta "Terminado" y borrado desde la lista** (RF-2, RF-6)
+- [x] **T27 — Etiqueta "Terminado" y borrado desde la lista** (RF-2, RF-6)
   - Archivos: `presentation/project_list_view.py`, `tests/presentation/test_list_actions.py`.
   - Hecho cuando: un proyecto terminado se distingue sin desaparecer, y borrar pide confirmación
     con su nombre y solo borra al confirmar.
