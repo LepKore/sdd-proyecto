@@ -11,6 +11,8 @@ DATA_ENV_VAR = "CROCHET_TRACKER_DATA"
 APP_DIR_NAME = "CrochetTracker"
 GUIDES_DIR_NAME = "guides"
 DB_FILE_NAME = "crochet.db"
+LOCK_FILE_NAME = "app.lock"
+ERROR_LOG_NAME = "error.log"
 
 
 def data_dir() -> Path:
