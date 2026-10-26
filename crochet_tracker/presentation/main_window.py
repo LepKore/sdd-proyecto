@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.project_view)
 
     def show_list(self) -> None:
-        """Go back to the list with every saved change visible (RF-3)."""
+        """Go back to the list with every saved change visible (RF-3, RF-16)."""
+        self.project_view.discard_undo()
         self.list_view.refresh()
         self.stack.setCurrentWidget(self.list_view)

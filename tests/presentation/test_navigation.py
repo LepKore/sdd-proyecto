@@ -16,7 +16,7 @@ def test_opening_a_project_shows_its_name(window, repository, clock) -> None:
     window.open_project(project)
 
     assert window.stack.currentWidget() is window.project_view
-    assert window.project_view.name_label.text() == "Bufanda de lana"
+    assert window.project_view.name_edit.text() == "Bufanda de lana"
 
 
 def test_only_one_project_is_open_at_a_time(window, repository, clock) -> None:
@@ -24,7 +24,7 @@ def test_only_one_project_is_open_at_a_time(window, repository, clock) -> None:
 
     window.open_project(create_project(repository, clock, "Amigurumi"))
 
-    assert window.project_view.name_label.text() == "Amigurumi"
+    assert window.project_view.name_edit.text() == "Amigurumi"
 
 
 def test_back_button_returns_to_the_list(window, repository, clock) -> None:

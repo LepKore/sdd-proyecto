@@ -80,7 +80,7 @@ def test_creating_a_project_opens_it(window, repository, clock, asked) -> None:
     window.list_view.new_button.click()
 
     assert window.stack.currentWidget() is window.project_view
-    assert window.project_view.name_label.text() == "Bufanda de lana"
+    assert window.project_view.name_edit.text() == "Bufanda de lana"
     assert len(repository.projects) == 1
 
 

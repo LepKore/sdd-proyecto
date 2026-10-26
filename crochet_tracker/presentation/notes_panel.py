@@ -1,6 +1,7 @@
 """Notes of the open project: add, edit with Save/Cancel, delete (RF-14, RF-15)."""
 
 from datetime import datetime
+from typing import Callable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -42,12 +43,14 @@ class NotesPanel(QWidget):
         repository: ProjectRepository,
         clock: Clock,
         undo: Undo,
+        on_change: Callable[[], None],
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self._repository = repository
         self._clock = clock
         self._undo = undo
+        self._on_change = on_change
         self._project: Project | None = None
         self._notes: list[Note] = []
 
@@ -116,6 +119,7 @@ class NotesPanel(QWidget):
             return
         self.new_text.clear()
         self.refresh()
+        self._on_change()
 
     def save(self) -> None:
         """Write the edited text keeping the creation date; blank keeps the old text (RF-15)."""
@@ -134,6 +138,7 @@ class NotesPanel(QWidget):
             QMessageBox.warning(self, strings.NOTES, strings.SAVE_FAILED)
             return
         self.refresh(select_id=note.id)
+        self._on_change()
 
     def cancel(self) -> None:
         """Throw the edit away and show the saved text again (RF-15, CL-23)."""
@@ -152,6 +157,7 @@ class NotesPanel(QWidget):
             QMessageBox.warning(self, strings.NOTES, strings.SAVE_FAILED)
             return
         self.refresh()
+        self._on_change()
 
     def _current(self) -> Note | None:
         item = self.notes_list.currentItem()
