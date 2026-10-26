@@ -23,7 +23,8 @@ Detalle y reparto de responsabilidades: `AGENTS.md`.
 `specs/` — todavía no existe; cuando exista, no se modifica sin petición explícita.
 `crochet_tracker/domain/` — existe: `errors.py` (jerarquía `DomainError`), `project.py`
 (`normalize_name` y la entidad `Project` con nombre, contadores, estado terminado y página) y
-`note.py` (entidad `Note`: texto y fecha de creación conservada al editar). Faltan `application/`,
+`note.py` (entidad `Note`: texto y fecha de creación conservada al editar) y `undo.py` (`Undo`:
+un solo paso, caducidad de 10 minutos, el inverso es un `Callable`). Faltan `application/`,
 `infrastructure/` y `presentation/`.
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
@@ -51,7 +52,9 @@ vacío y de más de 100 caracteres, nombres repetidos permitidos). T04 y T05 hec
 `Project` con `change_rows`/`change_knots` (delta, suelo en cero, sin techo) y
 `toggle_finished`. T06 hecha: `guide_page` con `change_page` (suelo en 1, tope en la última
 página conocida). T07 hecha: `note.py` con `Note(body, created_at)` y `edit` que conserva la fecha.
-Siguiente paso: T08 (deshacer: caducidad y alcance).
+T08 y T09 hechas: `undo.py` con `Undo` (una entrada, caducidad de 10 min medida con `now`
+inyectado, sin rehacer) y `restore_rows`/`restore_knots` en `Project` para el inverso.
+Siguiente paso: T10 (carpeta de datos).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).

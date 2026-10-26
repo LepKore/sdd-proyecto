@@ -42,12 +42,12 @@
   - Hecho cuando: se rechaza el texto vacío o solo espacios (CL-19), y editar conserva la fecha de
     creación original.
 
-- [ ] **T08 — Deshacer: caducidad y alcance** (RF-16)
+- [x] **T08 — Deshacer: caducidad y alcance** (RF-16)
   - Archivos: `domain/undo.py`, `tests/domain/test_undo.py`.
   - Hecho cuando: con un reloj falso, la entrada caduca a los 10 minutos, solo hay un paso, no hay
     rehacer y un cambio no deshacible no borra la entrada pendiente.
 
-- [ ] **T09 — Deshacer: operaciones inversas** (RF-16)
+- [x] **T09 — Deshacer: operaciones inversas** (RF-16)
   - Archivos: `domain/undo.py`, `tests/domain/test_undo_ops.py`.
   - Hecho cuando: deshacer un contador devuelve el valor anterior y deshacer el borrado de una nota
     devuelve texto y fecha originales.

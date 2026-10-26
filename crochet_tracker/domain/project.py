@@ -45,6 +45,13 @@ class Project:
     def change_knots(self, delta: int) -> None:
         self.knots_done = max(0, self.knots_done + delta)
 
+    def restore_rows(self, rows_done: int) -> None:
+        """Put a counter back where it was; used by undo (RF-16)."""
+        self.rows_done = max(0, rows_done)
+
+    def restore_knots(self, knots_done: int) -> None:
+        self.knots_done = max(0, knots_done)
+
     def toggle_finished(self) -> None:
         self.is_finished = not self.is_finished
 
