@@ -1,6 +1,6 @@
 # Revisión de la spec 001 — 2026-10-26
 
-> Comando de referencia: `.\.venv\Scripts\python.exe -m pytest -q` → **276 passed**.
+> Comando de referencia: `.\.venv\Scripts\python.exe -m pytest -q` → **284 passed**.
 > Cada RF se ha ejecutado además por separado (`pytest -q <archivos> -k "<filtro>"`), con el
 > número de tests que se indica. Las selecciones de dos RF pueden compartir algún test.
 
@@ -13,7 +13,7 @@
 | **RF-3** Abrir y volver | `application/test_projects.py::test_open_returns_the_saved_progress`, `::test_open_a_deleted_project_returns_none` · `infrastructure/test_repository.py::test_opening_a_project_does_not_reorder_the_list`, `::test_every_change_reads_back_the_same_after_reopening` · `presentation/test_navigation.py` (6) · `presentation/test_list_actions.py::test_opening_from_the_list_does_not_reorder_it` | **15 passed** |
 | **RF-4** Renombrar | `domain/test_project_name.py` (mismas reglas que al crear) · `application/test_projects.py::test_rename_is_saved_and_survives_reopening`, `::test_rename_to_a_blank_name_keeps_the_previous_one`, `::test_rename_restores_the_old_name_when_saving_fails` · `infrastructure/test_repository.py::test_renaming_persists_and_bumps_updated_at` · `presentation/test_project_actions.py` (nombre y renombrado, 6) | **28 passed** |
 | **RF-5** Terminado | `domain/test_finished.py` (5) · `application/test_projects.py::test_finished_state_toggles_and_is_saved`, `::test_finished_state_is_kept_when_saving_fails` · `infrastructure/test_repository.py::test_finishing_a_project_persists_both_ways` · `presentation/test_project_actions.py::test_marking_finished_shows_the_label`, `::test_unmarking_hides_the_label`, `::test_a_finished_project_still_counts` (CL-28) · `presentation/test_list_actions.py::test_a_finished_project_can_still_be_opened` | **15 passed** |
-| **RF-6** Borrar | `application/test_projects.py::test_delete_removes_the_project_and_its_notes`, `::test_delete_of_a_missing_project_is_silent` · `infrastructure/test_delete_repo.py` (5, incluye borrado del PDF copiado) · `infrastructure/test_atomicity.py::test_a_failed_delete_keeps_the_project_its_notes_and_its_guide` · `presentation/test_list_actions.py::test_deleting_asks_with_the_project_name`, `::test_cancelling_keeps_the_project`, `::test_confirming_removes_it_from_the_list`, `::test_confirming_removes_its_notes` | **15 passed** |
+| **RF-6** Borrar | `application/test_projects.py::test_delete_removes_the_project_and_its_notes`, `::test_delete_of_a_missing_project_is_silent` · `infrastructure/test_delete_repo.py` (5, incluye borrado del PDF copiado) · `infrastructure/test_atomicity.py::test_a_failed_delete_keeps_the_project_its_notes_and_its_guide` · `presentation/test_list_actions.py::test_deleting_asks_with_the_project_name`, `::test_cancelling_keeps_the_project`, `::test_confirming_removes_it_from_the_list`, `::test_confirming_removes_its_notes`, `::test_delete_button_recovers_when_qt_loses_the_selection`, `::test_clicking_delete_button_opens_the_confirmation` | **17 passed** |
 | **RF-7** Instancia única | `infrastructure/test_single_instance.py` (5: primero obtiene el bloqueo, segundo no, liberar permite volver, `app.lock` en la carpeta de datos) · `test_entrypoint.py::test_a_second_instance_warns_and_exits_with_0`, `::test_without_arguments_it_starts_and_closes_normally` | **6 passed** |
 | **RF-8** Adjuntar guía | `infrastructure/test_guide_store.py` (9: copia, original borrado, nombres distintos, no-PDF, 0 páginas, copia interrumpida) · `application/test_guide.py::test_attaching_a_guide_copies_it_and_remembers_its_name`, `::test_a_project_with_a_guide_gets_no_second_one`, `::test_an_unreadable_file_leaves_the_project_without_a_guide`, `::test_a_guide_that_cannot_be_saved_is_not_assigned` · `presentation/test_guide_view.py::test_attaching_a_pdf_shows_it_without_restarting`, `::test_cancelling_the_file_dialog_changes_nothing`, `::test_a_file_that_is_not_a_pdf_warns_and_stays_without_guide`, `::test_a_project_with_a_guide_does_not_offer_another` | **12 passed** |
 | **RF-9** Proyecto sin guía | `presentation/test_guide_view.py::test_without_a_guide_it_says_so_and_offers_one`, `::test_broken_stored_file_behaves_as_no_guide`, `::test_a_missing_stored_file_behaves_as_no_guide` · `infrastructure/test_guide_store.py::test_a_missing_guide_is_reported_as_no_guide` · `application/test_guide.py::test_an_unreadable_file_leaves_the_project_without_a_guide` | **6 passed** |
@@ -50,7 +50,7 @@
 | 6 | Renombrar, terminar y borrar con confirmación | RF-4, RF-5, RF-6 (58 tests; el diálogo se sustituye en los tests) | Cumple en automático; falta la pasada manual |
 | 7 | PDF dañado: mensaje comprensible y proyecto usable | `test_guide_store.py::test_a_file_that_is_not_a_pdf_is_rejected`, `test_guide_view.py::test_broken_stored_file_behaves_as_no_guide`, `test_a_file_that_is_not_a_pdf_warns_and_stays_without_guide` | Cumple en automático; falta la pasada manual |
 | 8 | Segunda instancia no abre otra ventana | `test_single_instance.py` (5) + `test_entrypoint.py::test_a_second_instance_warns_and_exits_with_0` | Cumple en automático con doble; **no probado con dos procesos reales** |
-| 9 | `pytest -q` en verde | 276 passed | **Cumplido** |
+| 9 | `pytest -q` en verde | 284 passed | **Cumplido** |
 | 10 | Ningún import de interfaz, PDF o base de datos en la lógica | `test_domain_does_not_import_outer_layers`, `test_application_does_not_import_outer_layers` + grep manual: cero coincidencias | **Cumplido** |
 | 11 | Interfaz en español y sin red | guard de textos + grep de red | Cumplido en lo automático; falta la pasada manual de toda la interfaz |
 
@@ -58,7 +58,7 @@
 
 **La spec está cumplida en todo lo comprobable automáticamente**: los 17 RF tienen tests propios
 y pasan, los 7 RNF están cubiertos y los 11 criterios de §8 se sostienen con evidencia real
-(276 tests en verde, `.exe` construido y arrancado, cero imports de red y cero imports de capas
+(284 tests en verde, `.exe` reconstruido y arrancado, cero imports de red y cero imports de capas
 externas en `domain/` y `application/`).
 
 Queda pendiente lo que la propia spec marca `[manual]` y no se puede sustituir con tests:
