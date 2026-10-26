@@ -20,15 +20,16 @@ Detalle y reparto de responsabilidades: `AGENTS.md`.
 `/` — `README.md`, `AGENTS.md`, `docs/`, `.gitignore`.
 `.github/workflows/ci.yml` — CI: `pytest -q`; el check `tests` es obligatorio para mergear a `main`.
 `docs/constitution.md` — principios y puertas de calidad; gobierna specs y PRs.
-`specs/` — todavía no existe; cuando exista, no se modifica sin petición explícita.
+`specs/001-crochet-mvp/` — spec, plan técnico y lista de tareas; no se modifica sin pedirlo.
 `crochet_tracker/domain/` — existe: `errors.py` (jerarquía `DomainError`), `project.py`
 (`normalize_name` y la entidad `Project` con nombre, contadores, estado terminado y página) y
 `note.py` (entidad `Note`: texto y fecha de creación conservada al editar) y `undo.py` (`Undo`:
 un solo paso, caducidad de 10 minutos, el inverso es un `Callable`).
-`crochet_tracker/infrastructure/` — existe: `app_paths.py` (carpeta de datos, override por
-`CROCHET_TRACKER_DATA`), `migrations.py` (esquema v1 y migración con copia `.bak`) y
-`sqlite_repository.py` (`SqliteProjectRepository`: `add`, `get`, `list_all`, `save`). Faltan
-`application/` y `presentation/`.
+`crochet_tracker/infrastructure/` — existe: `app_paths.py` (carpeta de datos y nombre de la
+carpeta `guides`, override por `CROCHET_TRACKER_DATA`), `migrations.py` (esquema v1 y migración
+con copia `.bak`), `sqlite_repository.py` (`SqliteProjectRepository`: proyectos y notas, borrado
+en cascada del PDF), `guide_store.py` (`GuideStore`: copia el PDF y devuelve solo su nombre) y
+`clock.py` (`SystemClock.now()`, segundos). Faltan `application/` y `presentation/`.
 Nota para IA: no modificar nada dentro de `specs/` ni `docs/constitution.md` sin pedirlo.
 
 ## 4. Comandos críticos
@@ -65,7 +66,10 @@ desc) y `save` (todos los campos mutables + `updated_at`); una conexión por ope
 reciente primero), `save_note` (conserva la fecha) y `delete_note`; `delete_project` borra el
 proyecto, sus notas por cascada y su PDF de `<datos>/guides/`, y `Note` gana `id`. T16 hecha:
 `tests/infrastructure/test_atomicity.py` fuerza fallos de `COMMIT` y comprueba que no queda nada a
-medias. Siguiente paso: T17 (guía en disco).
+medias. T17 hecha: `GuideStore` copia el PDF a `<datos>/guides/<id>-<uuid>.pdf` con un `.part`
+temporal y `os.replace`, rechaza lo que PDFium no abre (dañado, protegido o de 0 páginas) y
+`path()` devuelve `None` cuando la copia ya no está. T18 hecha: `clock.SystemClock.now()`.
+Siguiente paso: T19 (puertos `ProjectRepository`, `GuideStore` y `Clock`, y dobles en memoria).
 La spec está cerrada en revisión 5 (17 RF, 7 RNF, 31 casos límite, 0 dudas abiertas) y el plan
 técnico en `specs/001-crochet-mvp/plan.md`.
 Descartado para siempre, no aparcado: el porcentaje de avance (no hay total con el que comparar).

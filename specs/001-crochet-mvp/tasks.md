@@ -85,12 +85,12 @@
   - Archivos: `tests/infrastructure/test_atomicity.py`.
   - Hecho cuando: un `COMMIT` forzado a fallar deja el valor anterior intacto y no hay fila a medias.
 
-- [ ] **T17 — Guía en disco** (RF-8, RF-9)
+- [x] **T17 — Guía en disco** (RF-8, RF-9)
   - Archivos: `infrastructure/guide_store.py`, `tests/infrastructure/test_guide_store.py`.
   - Hecho cuando: copia a un temporal y mueve al final, rechaza lo que no es PDF legible, y un
     archivo ausente se informa como "sin guía" (CL-9..CL-11).
 
-- [ ] **T18 — Reloj real** (RF-16)
+- [x] **T18 — Reloj real** (RF-16)
   - Archivos: `infrastructure/clock.py`, `tests/infrastructure/test_clock.py`.
   - Hecho cuando: el reloj devuelve la hora del sistema y es sustituible por el falso en tests.
 
